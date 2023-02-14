@@ -109,6 +109,19 @@ batting_3 <- batting_2
 batting_3$pr <- sums
 batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
 batting_ordered$rank <- 1:nrow(batting_ordered)
+
+# Repeat the calculations on only the top 300
+# Normalize to this number to compare against batters better
+temp <- left_join(batting_ordered[1:300, 1:3], batting_2, by = c("Name", 'Team', 'PlayerId'))
+batting_2 <- temp
+non_cats <- c(1:4, 11, 12)
+temp <- apply(batting_2[, -non_cats], 2, z_score)
+batting_2 <- cbind(batting_2[, non_cats], temp)
+sums <- apply(batting_2[, -c(1:6)], 1, sum)
+batting_3 <- batting_2
+batting_3$pr <- sums
+batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
+batting_ordered$rank <- 1:nrow(batting_ordered)
 ```
 
 ## See if it works
@@ -121,3 +134,30 @@ head(batting_in_order)
 ```{r}
 write.csv(batting_ordered, "batc_pr.csv")
 ```
+
+## Combining with pitching
+
+```{r}
+combined <- rbind(batting_ordered[, c(1:3, ncol(batting_ordered)-1)], pitching_ordered[, c(1:3, ncol(pitching_ordered)-1)])
+shohei_combined <- sum(combined[combined$Name == 'Shohei Ohtani', 'pr'])
+test <- combined %>% 
+  distinct(Name, .keep_all = T)
+test[test$Name == 'Shohei Ohtani', 'pr'] <- shohei_combined
+
+joined <- left_join(test, id_map, by = c('PlayerId' = 'IDFANGRAPHS'))
+final <- joined %>% 
+  select(Name, Team, PlayerId, pr, POS)
+final <- final %>% 
+  mutate(pos_2 = if_else(POS == '1B', '1B/3B',
+                         if_else(POS == '3B', '1B/3B',
+                                 if_else(POS == '2B', '2B/SS',
+                                         if_else(POS == 'SS', '2B/SS',
+                                                 if_else(POS == 'DH', 'UTIL',
+                                                                 if_else(POS == 'SP', 'P',
+                                                                         if_else(POS == 'RP', 'P',POS))))))))
+final <- final %>% 
+  select(Name, Team, POS, pr)
+names(final) <- c('name', 'team', 'position', 'points')
+write.csv(final, 'players.csv')
+```
+
