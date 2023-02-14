@@ -1,0 +1,208 @@
+---
+title: "webscraping excel past seasons"
+author: "William Foote"
+date: "3/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(corrplot)
+raw2018 <- read_excel("matchups_raw_2018.xlsx")
+raw2019 <- read_excel("matchups_raw_2019.xlsx")
+raw2020 <- read_excel("matchups_raw_2020.xlsx")
+```
+
+# Let's clean
+
+## 2018
+
+```{r}
+abbr <- c("WILL", "DET", "Yaya", "HOSS", "Nuke", "USA", "SEAG", "JAKE", "Mvp", "DB")
+
+raw2018_v2 <- raw2018[raw2018$`1` %in% abbr, ] # Get all the rows that start with a team abbreviation. Genius!
+
+names(raw2018_v2) <- c("Team", "R", "HR", "RBI", "RC", "AVG", "OPS", 
+                       "IP", "QS", "ERA", "WHIP", "K/9", "SVHD")
+
+for(i in seq_len(12)) {
+  raw2018_v2[[i + 1]] <- as.numeric(raw2018_v2[[i + 1]])
+}
+```
+
+## 2019
+
+```{r}
+abbr_2 <- c("WILL", "BF", "GOT", "JAKE", "DB", "RW", "Yaya", "DET", "99", "HOSS")
+
+raw2019_v2 <- raw2019[raw2019$`1` %in% abbr_2, ] # Get all the rows that start with a team abbreviation. Genius!
+
+names(raw2019_v2) <- c("Team", "R", "HR", "RBI", "RC", "AVG", "OPS", 
+                       "IP", "QS", "ERA", "WHIP", "K/9", "SVHD")
+
+for(i in seq_len(12)) {
+  raw2019_v2[[i + 1]] <- as.numeric(raw2019_v2[[i + 1]])
+}
+```
+
+## 2020
+
+```{r}
+abbr_3 <- c("WILL", "TV19", "NO", "NAS", "DB", "99", "GMEN", "RW", "JAKE", "BLM")
+
+raw2020_v2 <- raw2020[raw2020$`1` %in% abbr_3, ] # Get all the rows that start with a team abbreviation. Genius!
+
+names(raw2020_v2) <- c("Team", "R", "HR", "RBI", "RC", "AVG", "OPS", 
+                       "IP", "QS", "ERA", "WHIP", "K/9", "SVHD")
+
+for(i in seq_len(12)) {
+  raw2020_v2[[i + 1]] <- as.numeric(raw2020_v2[[i + 1]])
+}
+```
+
+## Add Matchup Data
+
+### 2018
+
+```{r}
+raw2018_v3 <- raw2018_v2
+
+for (i in seq_len(24)) {
+  raw2018_v3[((i - 1) * 10 + 1):(i * 10), "matchup_id"] <- i
+}
+
+top <- raw2018_v2[1, -1]
+bottom <- raw2018_v2[2, -1]
+normalize <- c(1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1)
+diff_df <- (top - bottom) * normalize
+diff_df <- rbind(diff_df, -diff_df)
+
+for(i in seq_len(119)) {
+  top <- raw2018_v2[((i) * 2 + 1), -1]
+  bottom <- raw2018_v2[((i + 1) * 2), -1]
+  temp <- (top - bottom) * normalize
+  diff_df <- rbind(diff_df, temp, -temp)
+}
+
+wins_losses <- ifelse(diff_df > 0, 1, 0)
+ties <- ifelse(diff_df == 0, 1, 0)
+raw2018_v3$wins <- apply(wins_losses, 1, sum)
+raw2018_v3$ties <- apply(ties, 1, sum)
+raw2018_v3$losses <- 12 - raw2018_v3$wins - raw2018_v3$ties
+
+raw2018_v3 <- cbind(raw2018_v3[, -16], raw2018_v3[, 16])
+```
+
+### 2019
+
+```{r}
+raw2019_v3 <- raw2019_v2
+
+for (i in seq_len(24)) {
+  raw2019_v3[((i - 1) * 10 + 1):(i * 10), "matchup_id"] <- i
+}
+
+top <- raw2019_v2[1, -1]
+bottom <- raw2019_v2[2, -1]
+diff_df <- (top - bottom) * normalize
+diff_df <- rbind(diff_df, -diff_df)
+
+for(i in seq_len(119)) {
+  top <- raw2019_v2[((i) * 2 + 1), -1]
+  bottom <- raw2019_v2[((i + 1) * 2), -1]
+  temp <- (top - bottom) * normalize
+  diff_df <- rbind(diff_df, temp, -temp)
+}
+
+wins_losses <- ifelse(diff_df > 0, 1, 0)
+ties <- ifelse(diff_df == 0, 1, 0)
+raw2019_v3$wins <- apply(wins_losses, 1, sum)
+raw2019_v3$ties <- apply(ties, 1, sum)
+raw2019_v3$losses <- 12 - raw2019_v3$wins - raw2019_v3$ties
+
+raw2019_v3 <- cbind(raw2019_v3[, -16], raw2019_v3[, 16])
+```
+
+### 2020
+
+```{r}
+raw2020_v3 <- raw2020_v2
+
+for (i in seq_len(9)) {
+  raw2020_v3[((i - 1) * 10 + 1):(i * 10), "matchup_id"] <- i
+}
+
+top <- raw2020_v2[1, -1]
+bottom <- raw2020_v2[2, -1]
+normalize <- c(1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1)
+diff_df <- (top - bottom) * normalize
+diff_df <- rbind(diff_df, -diff_df)
+
+for(i in seq_len(44)) {
+  top <- raw2020_v2[((i) * 2 + 1), -1]
+  bottom <- raw2020_v2[((i + 1) * 2), -1]
+  temp <- (top - bottom) * normalize
+  diff_df <- rbind(diff_df, temp, -temp)
+}
+
+wins_losses <- ifelse(diff_df > 0, 1, 0)
+ties <- ifelse(diff_df == 0, 1, 0)
+raw2020_v3$wins <- apply(wins_losses, 1, sum)
+raw2020_v3$ties <- apply(ties, 1, sum)
+raw2020_v3$losses <- 12 - raw2020_v3$wins - raw2020_v3$ties
+
+raw2020_v3 <- cbind(raw2020_v3[, -16], raw2020_v3[, 16])
+```
+
+## Combine everything
+
+```{r}
+flb <- rbind(raw2018_v3, raw2019_v3, raw2020_v3)
+flb <- cbind(team = flb[, 1], matchup_id = flb[, 14], flb[, -c(1, 14)])
+```
+
+### Z-score normalize for comparison
+
+#### The function
+
+```{r}
+z_score <- function(x) {
+  m <- mean(x, na.rm = TRUE)
+  s <- sd(x, na.rm = TRUE)
+  z <- (x - m) / s
+  z
+}
+```
+
+#### The reformatting
+
+```{r}
+flz <- flb
+for (i in seq_len(12)) {
+  flz[[i + 2]] <- z_score(flz[[i + 2]])
+}
+```
+
+# EDA
+
+```{r}
+res <- cor(flz[, -c(1, 2, 3:8, 16, 17)])
+res_off <- cor(flz[, -c(1, 2, 9:14, 16, 17)])
+
+corrplot(res, type = "upper")
+corrplot(res_off, type = "lower")
+
+```
+
+# Kitchen sink
+
+
+```{r}
+m1_off <- lm(wins ~ RC + R + HR + RBI + AVG + OPS, flz)
+summary(m1_off)
+
+m1_pit <- lm(wins ~ IP + QS + ERA + WHIP + `K/9` + SVHD, flz)
+summary(m1_pit)
+```
+

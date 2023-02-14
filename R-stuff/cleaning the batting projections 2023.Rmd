@@ -1,0 +1,123 @@
+---
+title: "Cleaning Batting Projections 2023"
+output: html_document
+date: "2023-02-06"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+# bzip <- read.csv("bat_zips.csv")
+# bsteamer <- read.csv("bat_steamer.csv")
+# bdc <- read.csv("bat_dc.csv")
+# bbat <- read.csv("bat_bat.csv")
+batc <- read.csv("bat_atc_23.csv")
+```
+
+# Exploratory functions
+
+```{r}
+# nrow(bzip)
+# nrow(bsteamer)
+# nrow(bdc)
+# nrow(bbat)
+nrow(batc)
+```
+
+# Reorder largest to smallest
+
+```{r}
+ordered <- c("bsteamer", "bzip", "batc", "bbat", "bdc")
+```
+
+The formula for Runs Created is as follows (roughly):
+
+=((H+BB+HBP-CS)*(TB)+.26*(BB+HBP))+.52(SB))/(AB+BB+HBP))
+
+Note
+
+TB = SLG * AB
+
+# Make Runs Created
+
+## First, make TB
+
+```{r}
+# bsteamer$TB <- with(bsteamer, SLG * AB)
+# bzip$TB <- with(bzip, SLG * AB)
+batc$TB <- with(batc, SLG * AB)
+# bbat$TB <- with(bbat, SLG * AB)
+# bdc$TB <- with(bdc, SLG * AB)
+```
+
+## Next try making RC
+
+```{r}
+# bsteamer$RC <- with(bsteamer, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+# bzip$RC <- with(bzip, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+
+# If they have HBP and CS in the projections:
+batc$RC <- with(batc, ((H+BB+HBP-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+# Without HBP and CS:
+#batc$RC <- with(batc, ((H+BB)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+
+# bbat$RC <- with(bbat, ((H+BB-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+# bdc$RC <- with(bdc, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+```
+
+Note, bbat and batc don't have HBP projected
+
+# Weight the ratio stats
+
+```{r}
+batc$wAVG <- batc$AVG * batc$AB
+batc$wOPS <- batc$OPS * batc$AB
+
+```
+
+## 2023
+
+```{r}
+batting <- batc %>%
+  select(Name, Team, PlayerId, AB, R, HR, RBI, RC, wAVG, wOPS, AVG, OPS)
+
+names(batting)
+```
+
+## Write in the z-score function
+
+```{r}
+z_score <- function(x) {
+  x <- as.numeric(x)
+  m <- mean(x, na.rm = TRUE)
+  s <- sd(x, na.rm = TRUE)
+  z <- (x - m) / s
+  z
+}
+```
+
+## Use the z-score function
+
+```{r}
+batting_2 <- batting
+non_cats <- c(1:4, 11, 12)
+temp <- apply(batting_2[, -non_cats], 2, z_score)
+batting_2 <- cbind(batting_2[, non_cats], temp)
+sums <- apply(batting_2[, -c(1:6)], 1, sum)
+batting_3 <- batting_2
+batting_3$pr <- sums
+batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
+batting_ordered$rank <- 1:nrow(batting_ordered)
+```
+
+## See if it works
+
+```{r}
+batting_in_order <- batting_3[with(batting_3, order(batting_3$pr, decreasing = TRUE)), ]
+head(batting_in_order)
+```
+
+```{r}
+write.csv(batting_ordered, "batc_pr.csv")
+```
