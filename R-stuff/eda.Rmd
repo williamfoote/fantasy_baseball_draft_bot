@@ -1,0 +1,207 @@
+---
+title: "eda"
+author: "William Foote - 305134696"
+date: "3/26/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(stringr)
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+draft19 <- read_excel('draft_2019.xlsx')
+draft20 <- read_excel('draft_2020.xlsx')
+draft21 <- read_excel('draft_2021.xlsx')
+library(ggplot2)
+library(plotly) 
+library(tidyr)
+espn_id <- read.csv("espn_ids.csv", row.names = 1)
+library(lattice)
+id_map <- read.csv("id_map.csv")
+id_map <- id_map[, c(2, 9, 19, 29)]
+names(id_map) <- c("Player", "playerid", 'espn_id', 'name')
+adp22 <- read.csv('adp.csv')
+adp22 <- adp22[, -c(1, 3, 4, 5, 7)]
+names(adp22) <- c('name', 'adp')
+adp20 <- read.csv('adp_2020.csv')
+adp21 <- read.csv('adp_2021.csv')
+rankings21 <- read.csv("combined_rankings_2021.csv")
+```
+
+```{r}
+df <- draft21 %>% 
+  separate(col = 'Name', into = c("name", "team", "position"), sep = "[^a-zA-Z1-9\\.\\s'-]+")
+df$NO. <- 1:300
+df <- data.frame(df)
+names(df)
+
+df2 <- draft20 %>% 
+  separate(col = 'Name', into = c("name", "team", "position"), sep = "[^a-zA-Z1-9\\.\\s'-]+")
+df2$NO. <- 1:300
+df2 <- data.frame(df2)
+names(df2)
+
+df3 <- draft19 %>% 
+  separate(col = 'Name', into = c("name", "team", "position"), sep = "[^a-zA-Z1-9\\.\\s'-]+")
+df3$NO. <- 1:300
+df3 <- data.frame(df3)
+names(df3)
+```
+
+```{r}
+merged <- merge(df, espn_id, by = 'name', all.x = T)
+names(merged) <- c("Name", "team", "position", "owner", "draft", "espn_id")
+
+merged2 <- merge(df2, espn_id, by = 'name', all.x = T)
+names(merged2) <- c("Name", "team", "position", "owner", "draft", "espn_id")
+
+merged3 <- merge(df3, espn_id, by = 'name', all.x = T)
+names(merged3) <- c("Name", "team", "position", "owner", "draft", "espn_id")
+
+summary(merged$espn_id)
+summary(merged2$espn_id)
+summary(merged3$espn_id)
+
+```
+
+# Make overall dataset
+
+```{r}
+merged$year <- '2021'
+merged2$year <- '2020'
+merged3$year <- '2019'
+ovr <- rbind(merged, merged2, merged3)
+```
+
+```{r}
+png(file="draft.png", res = 300, height = 9, width = 16, units = 'in')
+p2 <-ggplot(merged, aes(x=position, y=draft/10, fill = owner)) +
+    geom_dotplot(binaxis='y', stackdir='center', dotsize = .5, binwidth = 1, method = 'histodot')
+p2 + facet_wrap(. ~ owner, ncol = 5)
+dev.off()
+```
+
+```{r}
+p2 <-ggplot(merged2, aes(x=position, y=draft/10, fill = owner)) +
+    geom_dotplot(binaxis='y', stackdir='center', dotsize = .5, binwidth = 1, method = 'histodot')
+p2 + facet_wrap(. ~ owner, ncol = 5)
+```
+
+```{r}
+p3 <-ggplot(merged3, aes(x=position, y=draft/10, fill = owner)) +
+    geom_dotplot(binaxis='y', stackdir='center', dotsize = .5, binwidth = 1, method = 'histodot')
+p3 + facet_wrap(. ~ owner, ncol = 5)
+```
+# Position by year
+
+## Catcher
+
+```{r}
+c <-ggplot(ovr[ovr$position == 'C', ], aes(x=year, y=draft/10, fill = owner)) +
+    geom_dotplot(binaxis='y', stackdir='center', dotsize = .5, binwidth = 1, method = 'histodot') + geom_hline(yintercept = 4, lty = 2, col = "red")
+c
+```
+## SP
+
+```{r}
+sp <-ggplot(ovr[ovr$position == 'SP' & ovr$owner == "jake", ], aes(x=year, y=draft/10, fill = owner)) +
+    geom_dotplot(binaxis='y', stackdir='center', dotsize = .5, binwidth = 1, method = 'histodot') + geom_hline(yintercept = 4, lty = 2, col = "red")
+sp
+```
+
+# Looking at adp stuff
+
+# This year 2022
+
+```{r}
+fp <- merge(adp22, id_map, on = 'name')
+final_adp <- fp[, c(1, 4, 5, 2)]
+
+batm <- merge(consolidated, final_adp[, c(2, 4)], by = "playerid", all.x = T)
+patm <- merge(pitching_ordered, final_adp[, c(2, 4)], by = 'playerid', all.x = T)
+write.csv(batm, 'batm.csv')
+write.csv(patm, 'patm.csv')
+common_cols <- intersect(colnames(batm), colnames(patm))
+huge <- rbind(
+    subset(batm, select = common_cols), 
+    subset(patm, select = common_cols)
+)
+batm2 <- merge(huge, batm[c(1, 4:9)], by = 'playerid', all.x = TRUE)
+huge2 <- merge(batm2, patm[c(1, 10:15)], by = 'playerid', all.x = TRUE)
+
+merge()
+```
+
+## Graphs
+
+# Over and underrated
+
+```{r}
+g <- ggplot(huge2, aes(x = 1:1456, y = rank-adp, name = Name)) + geom_point() + coord_fixed() + geom_abline(slope = 0, intercept = 0, lty = 2)
+ggplotly(g)
+```
+
+```{r}
+g <- ggplot(huge2, aes(x = adp, y = rank, name = Name)) + geom_point() + coord_fixed() + geom_abline(slope = 1, intercept = 0, lty = 2) + xlim(0, 500) + ylim(0, 500)
+ggplotly(g)
+```
+
+# Past years (2019-2021)
+
+```{r}
+merge_adp <- merge(merged, adp21, on = "Name", all.x = T)
+pid_merge <- merge(merge_adp, df_id[, c(1, 21)], by = 'espn_id')
+# This is from the other file
+# df_id <- merge(consolidated, ids[, -c(1)], on = "playerid")
+# df_dp <- merge(df_id, merged[, -c(1, 3)], on = 'espn_id')
+big <- merge(rankings21, df_dp[, c(1, 2, 3, 12, 22, 23, 24)], by = 'playerid')
+rank21_id <- merge(rankings21, ids[, c(2, 3)], by = 'playerid')
+big2 <- merge(rank21_id, merged[, c(3, 4, 5, 6)], by = 'espn_id')
+```
+
+```{r}
+png(file="adp_v_adp.png", res = 300, height = 4.5, width = 8, units = 'in')
+
+ggplot(merge_adp, aes(x=draft, y=ADP, color=owner)) +
+    geom_point(size = 1.5) + facet_wrap(. ~ owner, ncol = 5) +
+  labs(title = "Who Follows ADP Trends Most?\nRed = Owner-Specific Trendline, Black = Perfect 'y=x' Trendline") + ylab("ESPN Average Draft Position") + xlab("Actual Draft Position") + geom_abline(slope = 1, intercept = 0, lty = 2) + xlim(0, 350) + ylim(0, 350) + theme(aspect.ratio=1)+
+    geom_smooth(method = "lm", se=FALSE, col = "maroon")
+dev.off()
+```
+
+# By position
+
+```{r}
+m1 <- with(batm, lm(R ~ adp))
+m2 <- with(batm, lm(HR ~ adp))
+m3 <- with(batm, lm(RBI ~ adp))
+m4 <- with(batm, lm(RC ~ adp))
+m5 <- with(batm, lm(AVG ~ adp))
+m6 <- with(batm, lm(OPS ~ adp))
+
+plot(x = batm$adp, y = batm$HR, col = 'white', ylim = c(-1, 2), xlab = 'adp', ylab = 'Category (z-score)',
+     main = 'Category Z-Score Scarcity as ADP Increases')
+legend('topright', c("R", "HR", "RBI", "RC", "AVG", "OPS"), lty = 1, col = mycols, lwd = 2)
+abline(coef = m1$coefficients, col = 'red')
+abline(coef = m2$coefficients, col = 'orange')
+abline(coef = m3$coefficients, col = 'yellow')
+abline(coef = m4$coefficients, col = 'green')
+abline(coef = m5$coefficients, col = 'blue')
+abline(coef = m6$coefficients, col = 'purple')
+
+models_list <- list(m1, m2, m3, m4, m5, m6)
+
+mycols <- c("tomato", 'orange', 'goldenrod', 'forestgreen', 'dodgerblue', 'purple')
+par(mfrow = c(2, 2))
+
+for (i in seq_len(6)) {
+  rsq <- round(summary(models_list[[i]])$r.squared, 2)
+  plot(batm[, i + 2] ~ batm[, 21], main = paste(names(batm)[i + 2], "; R-Squared = ", rsq, sep = ""), col = mycols[i], pch = 19, xlab = 'adp', ylab = names(batm)[i + 2], ylim = c(-5, 5), cex = .5)
+}
+
+plot(batm[, 4 + 2] ~ batm[, 21], col = mycols[4], pch = 19, xlab = 'adp', ylab = names(batm)[4 + 2], ylim = c(-5, 5), cex = .5)
+points(batm[, 6 + 2] ~ batm[, 21], col = mycols[6], pch = 19, xlab = 'adp', ylab = names(batm)[6 + 2], ylim = c(-5, 5), cex = .5)
+abline(coef = m4$coefficients, col = 'green')
+abline(coef = m6$coefficients, col = 'purple')
+```
+

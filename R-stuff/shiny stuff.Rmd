@@ -1,0 +1,49 @@
+---
+title: "shiny"
+author: "William Foote - 305134696"
+date: "3/31/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+big2 <- read.csv("2021_draft_full.csv")
+big2$is_batter <- ifelse(!(big2$position %in% c("SP", "RP")), 'batter', 'pitcher')
+```
+
+```{r}
+models_list <- vector('list', 10)
+names <- unique(big2$owner)
+for (i in seq_len(10)) {
+  this_name <- names[i]
+  models_list[[i]] <- with(big2[big2$owner == this_name, ],
+                         (lm(draft ~ adp + position)))
+  names(models_list)[i] <- this_name
+}
+
+models_list2 <- vector('list', 10)
+names <- unique(big2$owner)
+for (i in seq_len(10)) {
+  this_name <- names[i]
+  models_list2[[i]] <- with(big2[big2$owner == this_name, ],
+                         (lm(draft ~ adp + position + RC.ERA)))
+  names(models_list2)[i] <- this_name
+}
+```
+
+```{r}
+for (i in seq_len(10)){
+  message(summary(models_list[[i]])$adj.r.squared)
+}
+message('bob')
+for (i in seq_len(10)){
+  message(summary(models_list2[[i]])$adj.r.squared)
+}
+```
+
+```{r}
+saveRDS(models_list, "models_list.RDS")
+saveRDS(models_list2, "fantasy_baseball_app/models_list2.RDS")
+write.csv(big2, 'fantasy_baseball_app/big2.csv')
+```
+

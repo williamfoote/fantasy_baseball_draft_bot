@@ -1,0 +1,11 @@
+name: baseball_app
+title:
+username:
+account: williamfoote
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6463479
+bundleId: 5994428
+url: https://williamfoote.shinyapps.io/baseball_app/
+when: 1654821449.31107
+lastSyncTime: 1654821449.31108

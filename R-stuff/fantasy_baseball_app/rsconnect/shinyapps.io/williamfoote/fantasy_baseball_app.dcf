@@ -1,0 +1,13 @@
+name: fantasy_baseball_app
+title: fantasy_baseball_app
+username:
+account: williamfoote
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6463496
+bundleId: 5994650
+url: https://williamfoote.shinyapps.io/fantasy_baseball_app/
+when: 1654830540.64074
+lastSyncTime: 1654830540.64075
+asMultiple: FALSE
+asStatic: FALSE
