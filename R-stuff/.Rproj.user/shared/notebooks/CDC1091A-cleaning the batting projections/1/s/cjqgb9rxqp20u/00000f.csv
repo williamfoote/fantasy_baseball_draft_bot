@@ -1,5 +1,0 @@
-"0","batting <- batc[, c(1, 2, 32, 10, 9, 11, 34, 18, 21)]
-"
-"2","Error in `[.data.frame`(batc, , c(1, 2, 32, 10, 9, 11, 34, 18, 21)) : 
-  undefined columns selected
-"

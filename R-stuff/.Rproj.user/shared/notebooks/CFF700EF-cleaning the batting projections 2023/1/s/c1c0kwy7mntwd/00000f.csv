@@ -1,5 +1,0 @@
-"0","batting_ordered$rank <- 1:629
-"
-"2","Error in `$<-.data.frame`(`*tmp*`, rank, value = 1:629) : 
-  replacement has 629 rows, data has 617
-"

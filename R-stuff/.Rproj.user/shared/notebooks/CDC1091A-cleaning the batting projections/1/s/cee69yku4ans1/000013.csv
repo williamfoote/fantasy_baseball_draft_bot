@@ -1,9 +1,0 @@
-"0","# bsteamer$RC <- with(bsteamer, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
-# bzip$RC <- with(bzip, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
-# If they have HBP in the projections:
-# batc$RC <- with(batc, ((H+BB+HBP-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
-batc$RC <- with(batc, ((H+BB-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
-"
-"2","Error in eval(substitute(expr), data, enclos = parent.frame()) : 
-  object 'CS' not found
-"
