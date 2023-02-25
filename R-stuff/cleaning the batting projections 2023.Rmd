@@ -122,6 +122,12 @@ batting_3 <- batting_2
 batting_3$pr <- sums
 batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
 batting_ordered$rank <- 1:nrow(batting_ordered)
+
+# add the raw data for context
+batting_raw = batting[, -c(4, 9, 10)]
+names(batting_raw)[-c(1:3)] <- paste(names(batting_raw)[-c(1:3)], '_raw', sep = '')
+almost_done = left_join(batting_ordered, batting_raw, by = c("Name", 'Team', 'PlayerId'))
+final_bat <- almost_done[, c(1:4, 15:20, 5:14)]
 ```
 
 ## See if it works
@@ -160,5 +166,21 @@ final <- final %>%
   select(Name, Team, POS, pr)
 names(final) <- c('name', 'team', 'position', 'points')
 write.csv(final, 'players.csv')
+```
+
+
+```{r}
+full_20 <- read.csv('combined_2020_projections.csv')
+full_21 <- read.csv('combined_2021_projections.csv')
+full_22 <- read.csv('combined_2022_projections.csv')
+names(full_20) <- names(full_21)
+names(full_22) <- names(full_21)
+
+combined_proj = rbind(full_20, full_21, full_22)
+combined_proj = left_join(combined_proj, id_map[, c(9, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
+  distinct()
+write.csv(combined_proj, 'combined_projections.csv')
+
+
 ```
 
