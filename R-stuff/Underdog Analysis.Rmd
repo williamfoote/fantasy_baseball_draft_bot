@@ -1,0 +1,55 @@
+---
+title: "Underdog ETL Pipeline"
+output: html_document
+date: "2023-02-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+batc <- read.csv("bat_atc_23.csv")
+batc <- left_join(batc, id_map[, c('POS', 'IDFANGRAPHS')], by = c('PlayerId' = 'IDFANGRAPHS'))
+batc$POS <- with(batc, ifelse(POS %in% c('1B', '2B', '3B', 'C', 'SS'), 'IF',
+                              ifelse(POS %in% c('DH', 'OF', 'P'), 'OF', POS)))
+patc <- read.csv("pitch_atc_23.csv")
+patc <- left_join(patc, id_map[, c('POS', 'IDFANGRAPHS')], by = c('PlayerId' = 'IDFANGRAPHS')) 
+```
+
+```{r}
+get_points <- function(x, player_type = 'batter', cats, points) {
+  # Takes a dataframe x and calculates the projected fantasy points
+  # Based on cats (vector of category names), and points, an n x 1 matrix
+  # Corresponding to how many points per category instance. Key-value pairs
+  # Of Sorts.
+  if (player_type == 'batter') {
+    meta <- x %>% 
+      select(c('Name', 'Team', 'PlayerId'))
+    numeric_cols <- x %>% 
+      select(all_of(cats))
+    fpts <- as.matrix(numeric_cols) %*% points
+  }
+  fpts
+}
+
+get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB', 'HBP', 'RBI', 'R', 'SB'),
+           points = matrix(c(3, 6, 8, 10, 3, 3, 2, 2, 4), ncol = 1))
+
+get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
+           points = matrix(c(5, 5, 3, 3, -3), ncol = 1))
+
+batc$proj_fpts <- get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB', 'HBP', 'RBI', 'R', 'SB'),
+           points = matrix(c(3, 6, 8, 10, 3, 3, 2, 2, 4), ncol = 1))
+
+patc$proj_fpts <- get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
+           points = matrix(c(5, 5, 3, 3, -3), ncol = 1))
+```
+```{r}
+combined_fpts <- rbind(batc[, c('Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')],
+      patc[, c('Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')]) %>% 
+  distinct(Name, Team, .keep_all = T) %>% 
+  arrange(desc(proj_fpts))
+combined_fpts$rank <- 1:nrow(combined_fpts)
+```
+
