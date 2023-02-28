@@ -38,7 +38,7 @@ def get_draft_details(league_id, season_id):
     # newest API v3 url
     espn_cookies = {'swid': '{8F5C0C75-0EC6-4CD4-9C0C-750EC64CD455}',
     'espn_s2': 'AEBvIL4Dlefi3KlVW0JH87iCDbcx0707HaHAXb8P3MgYzjwJWCk1xxdv5Jx7tR0CBOFRNPNOwgz1%2BwcsidB7tbVivNai4urRBeT%2FzXT59InIGYVeI8KHVfwy1eHZmQy%2FS5MDXM8caPu0seOzHhRF7PpYibmzCnmRCN4OBxBDrUEioqe%2BJsL93wEsl6ElDWE8Ff8laLi4MLZUbN6gQ1jFiCYdqwbmAOfCPIK%2Fe%2FnVRRdIoI5jpK82fUujjmoDqqkDj%2BTRTERwvpxvTx49B%2F3FKZCj9GzKr3N8dh46X%2FUermxajA%3D%3D'}
-    url = 'https://fantasy.espn.com/apis/v3/games/flb/seasons/2022/segments/0/leagues/55646?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav'
+    url = 'https://fantasy.espn.com/apis/v3/games/flb/seasons/{}/segments/0/leagues/55646?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav'.format(season_id)
     #url = "https://fantasy.espn.com/apis/v3/games/flb/leagueHistory/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav&seasonId={}".format(league_id, season_id)
     r = requests.get(url,
                      cookies=espn_cookies,

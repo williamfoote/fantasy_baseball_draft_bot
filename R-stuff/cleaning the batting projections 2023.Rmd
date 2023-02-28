@@ -101,10 +101,11 @@ z_score <- function(x) {
 
 ```{r}
 batting_2 <- batting
-non_cats <- c(1:4, 11, 12)
+non_cats_names <- c('Name', 'Team', 'PlayerId', 'AB', 'AVG', 'OPS')
+non_cats <- which(names(batting_2) == non_cats_names)
 temp <- apply(batting_2[, -non_cats], 2, z_score)
 batting_2 <- cbind(batting_2[, non_cats], temp)
-sums <- apply(batting_2[, -c(1:6)], 1, sum)
+sums <- apply(batting_2[, c(7:12)], 1, sum)
 batting_3 <- batting_2
 batting_3$pr <- sums
 batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
@@ -112,12 +113,13 @@ batting_ordered$rank <- 1:nrow(batting_ordered)
 
 # Repeat the calculations on only the top 300
 # Normalize to this number to compare against batters better
-temp <- left_join(batting_ordered[1:300, 1:3], batting_2, by = c("Name", 'Team', 'PlayerId'))
+temp <- left_join(batting_ordered[1:300, 1:3], batting, by = c("Name", 'Team', 'PlayerId'))
 batting_2 <- temp
-non_cats <- c(1:4, 11, 12)
+non_cats_names <- c('Name', 'Team', 'PlayerId', 'AB', 'AVG', 'OPS')
+non_cats <- which(names(batting_2) == non_cats_names)
 temp <- apply(batting_2[, -non_cats], 2, z_score)
 batting_2 <- cbind(batting_2[, non_cats], temp)
-sums <- apply(batting_2[, -c(1:6)], 1, sum)
+sums <- apply(batting_2[, c(7:12)], 1, sum)
 batting_3 <- batting_2
 batting_3$pr <- sums
 batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
@@ -168,6 +170,7 @@ names(final) <- c('name', 'team', 'position', 'points')
 write.csv(final, 'players.csv')
 ```
 
+# Combined projections
 
 ```{r}
 full_20 <- read.csv('combined_2020_projections.csv')
@@ -181,6 +184,34 @@ combined_proj = left_join(combined_proj, id_map[, c(9, 19, 20)], by = c('playeri
   distinct()
 write.csv(combined_proj, 'combined_projections.csv')
 
+full_23 <- read.csv('combined_2023_projections.csv')
+names(full_23) <- names(full_21)
+combined_proj_23 <- left_join(full_23, id_map[, c(9, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
+  distinct()
+write.csv(combined_proj_23, 'combined_projections_23.csv')
 
+```
+
+## 2022 Combined projections
+
+```{r}
+fpros_adp <- read.csv('fpros_espn_adp_2023.csv')
+joined_1 <- left_join(fpros_adp[, c('Player', 'ESPN')], id_map[, c('IDFANGRAPHS', 'FANTPROSNAME', 'ESPNID', 'ESPNNAME')], 
+                      by = c('Player' = 'FANTPROSNAME'))
+
+test <- joined_1 %>% 
+  distinct(Player, ESPN, .keep_all = T)
+
+test[2, c('IDFANGRAPHS', 'ESPNID', 'ESPNNAME')] <- c(13510, 32801, 'Jose Ramirez')
+# test[266, c('ESPNID', 'ESPNNAME')] <- c(4424286, 'Spencer Torkelson')
+# test[322, c('ESPNID', 'ESPNNAME')] <- c(41325, 'Aaron Ashby')
+# test[32, c('ESPNID', 'ESPNNAME')] <- c(41199, 'Shane McClanahan')
+# test[69, c('ESPNID', 'ESPNNAME')] <- c(36380, 'Jordan Romano')
+
+bj <- left_join(batting_ordered, test, by = c('PlayerId' = 'IDFANGRAPHS'))
+pj <- left_join(pitching_ordered, test, by = c('PlayerId' = 'IDFANGRAPHS'))
+
+write.csv(bj, 'batting_for_combined_projections_23.csv')
+write.csv(pj, 'pitching_for_combined_projections_23.csv')
 ```
 
