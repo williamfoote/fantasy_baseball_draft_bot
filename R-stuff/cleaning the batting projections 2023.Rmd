@@ -180,13 +180,13 @@ names(full_20) <- names(full_21)
 names(full_22) <- names(full_21)
 
 combined_proj = rbind(full_20, full_21, full_22)
-combined_proj = left_join(combined_proj, id_map[, c(9, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
+combined_proj = left_join(combined_proj, id_map[, c(9, 6, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
   distinct()
 write.csv(combined_proj, 'combined_projections.csv')
 
 full_23 <- read.csv('combined_2023_projections.csv')
 names(full_23) <- names(full_21)
-combined_proj_23 <- left_join(full_23, id_map[, c(9, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
+combined_proj_23 <- left_join(full_23, id_map[, c(9, 6, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
   distinct()
 write.csv(combined_proj_23, 'combined_projections_23.csv')
 

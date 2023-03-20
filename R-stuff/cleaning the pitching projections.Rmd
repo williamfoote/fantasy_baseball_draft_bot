@@ -183,7 +183,7 @@ head(pitching_3)
 pitching_ordered <- pitching_3[order(pitching_3$pr, decreasing = TRUE), ]
 # Repeat the calculations on only the top 300
 # Normalize to this number to compare against batters better
-temp <- left_join(pitching_ordered[1:300, 1:3], pitching_2, by = c("Name", 'Team', 'PlayerId'))
+temp <- left_join(pitching_ordered[1:300, 1:3], pitch, by = c("Name", 'Team', 'PlayerId'))
 pitching_2 <- temp
 temp <- apply(pitching_2[, -c(1:3)], 2, z_score)
 pitching_2 <- cbind(pitching_2[, c(1, 2, 3)], temp)

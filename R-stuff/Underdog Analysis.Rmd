@@ -9,12 +9,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+id_map_2 <- read.csv('id_map_2.csv')
 batc <- read.csv("bat_atc_23.csv")
-batc <- left_join(batc, id_map[, c('POS', 'IDFANGRAPHS')], by = c('PlayerId' = 'IDFANGRAPHS'))
+batc <- left_join(batc, id_map_2[, c('POS', 'IDFANGRAPHS', 'UNDERDOG')], by = c('PlayerId' = 'IDFANGRAPHS'))
 batc$POS <- with(batc, ifelse(POS %in% c('1B', '2B', '3B', 'C', 'SS'), 'IF',
                               ifelse(POS %in% c('DH', 'OF', 'P'), 'OF', POS)))
 patc <- read.csv("pitch_atc_23.csv")
-patc <- left_join(patc, id_map[, c('POS', 'IDFANGRAPHS')], by = c('PlayerId' = 'IDFANGRAPHS')) 
+patc <- left_join(patc, id_map_2[, c('POS', 'IDFANGRAPHS', 'UNDERDOG')], by = c('PlayerId' = 'IDFANGRAPHS')) 
+
+underdog <- read.csv('underdog_rankings_raw.csv')
+
 ```
 
 ```{r}
@@ -33,11 +37,11 @@ get_points <- function(x, player_type = 'batter', cats, points) {
   fpts
 }
 
-get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB', 'HBP', 'RBI', 'R', 'SB'),
-           points = matrix(c(3, 6, 8, 10, 3, 3, 2, 2, 4), ncol = 1))
+#get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB', 'HBP', 'RBI', 'R', 'SB'),
+           #points = matrix(c(3, 6, 8, 10, 3, 3, 2, 2, 4), ncol = 1))
 
-get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
-           points = matrix(c(5, 5, 3, 3, -3), ncol = 1))
+#get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
+           #points = matrix(c(5, 5, 3, 3, -3), ncol = 1))
 
 batc$proj_fpts <- get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB', 'HBP', 'RBI', 'R', 'SB'),
            points = matrix(c(3, 6, 8, 10, 3, 3, 2, 2, 4), ncol = 1))
@@ -45,11 +49,22 @@ batc$proj_fpts <- get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB', 'HB
 patc$proj_fpts <- get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
            points = matrix(c(5, 5, 3, 3, -3), ncol = 1))
 ```
+
 ```{r}
-combined_fpts <- rbind(batc[, c('Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')],
-      patc[, c('Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')]) %>% 
+combined_fpts <- rbind(batc[, c('UNDERDOG', 'Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')],
+      patc[, c('UNDERDOG', 'Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')]) %>% 
   distinct(Name, Team, .keep_all = T) %>% 
   arrange(desc(proj_fpts))
 combined_fpts$rank <- 1:nrow(combined_fpts)
+
+combined_fpts[113, 'UNDERDOG'] = '5e2a3754-118c-47a7-b81e-51fb0c1ec8f3'
+combined_fpts[177, 'UNDERDOG'] = '44b1df17-224b-4fe3-98cd-dae156588aa6'
+
+#write.csv(combined_fpts, 'underdog_BB_mlb_rankings_23.csv')
+
+final <- left_join(combined_fpts, underdog, by = c('UNDERDOG' = 'id'))
+write.csv(final, 'underdog_BB_mlb_rankings_23.csv')
+
+
 ```
 
