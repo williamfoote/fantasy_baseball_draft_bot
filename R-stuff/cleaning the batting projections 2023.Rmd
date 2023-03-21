@@ -192,7 +192,7 @@ write.csv(combined_proj_23, 'combined_projections_23.csv')
 
 ```
 
-## 2022 Combined projections
+## 2023 Combined projections
 
 ```{r}
 fpros_adp <- read.csv('fpros_espn_adp_2023.csv')
@@ -202,7 +202,7 @@ joined_1 <- left_join(fpros_adp[, c('Player', 'ESPN')], id_map[, c('IDFANGRAPHS'
 test <- joined_1 %>% 
   distinct(Player, ESPN, .keep_all = T)
 
-test[2, c('IDFANGRAPHS', 'ESPNID', 'ESPNNAME')] <- c(13510, 32801, 'Jose Ramirez')
+test[1, c('IDFANGRAPHS', 'ESPNID', 'ESPNNAME')] <- c(13510, 32801, 'Jose Ramirez')
 # test[266, c('ESPNID', 'ESPNNAME')] <- c(4424286, 'Spencer Torkelson')
 # test[322, c('ESPNID', 'ESPNNAME')] <- c(41325, 'Aaron Ashby')
 # test[32, c('ESPNID', 'ESPNNAME')] <- c(41199, 'Shane McClanahan')

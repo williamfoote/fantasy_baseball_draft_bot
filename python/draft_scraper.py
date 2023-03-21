@@ -129,7 +129,7 @@ def get_draft_strategy(season_id, league_type = 'STANDARD'):
                      headers=custom_headers_2,
                      cookies=espn_cookies)
     draft_strat_data = r.json()
-    if season_id < 2022:
+    if season_id < 2023:
         ids = []
         rankings = []
         for i in range(0, 3000):
