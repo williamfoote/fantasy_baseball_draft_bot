@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Turn Tracker</title>
+  </head>
+  <body>
+    <h1>Turn Tracker</h1>
+    <form method="post">
+      {{ form.csrf_token }}
+      {{ form.name.label }} {{ form.name }}
+      <br>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>

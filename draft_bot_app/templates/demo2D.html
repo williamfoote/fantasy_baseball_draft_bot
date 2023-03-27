@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if done %}
+    {% if visualize %}
+        <center>
+            <h1>Your results are here.</h1>
+            <br/>
+            <h3>Textually...</h3>
+            <br/>
+            <p>{{solution}}</p>
+            <br/>
+            <h3>...and visually</h3>
+        </center>
+        <div id='chart' class='chart'”></div>
+        <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+        <script type='text/javascript'>
+        var graphs = {{graphJSON|safe}};
+        Plotly.plot('chart',graphs,{});
+        </script>
+        <br/>
+    {% else %}
+        <center>
+            <h1>Your results are here.</h1>
+            <br/>
+            <p>{{solution}}</p>
+            <br/><br/><br/>
+        </center>
+    {% endif %}
+{% else %}
+    <h1>plot image pixels given the corners (x, y) of the rectangle.</h1>
+
+    <form method="POST", action = #>
+        <br/>
+        {{ form.csrf_token }}
+            <p>
+                {{ form.cornerPoints.label }}
+                {{ form.cornerPoints(style="background-color:#eceff1; width:25%",
+                placeholder = "  ex: [(1, 1), (1, 3), (3, 1), (3, 3)]") }}
+            </p>
+        {% if form.cornerPoints.errors %}
+            <ul class="errors">
+                {% for error in form.cornerPoints.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+            <p>
+                {{ form.shape.label }}
+                {{ form.shape(style="background-color:#eceff1; width:25%",
+                placeholder = "  ex: (3, 3) for a 3x3 grid") }}
+            </p>
+
+        {% if form.shape.errors %}
+            <ul class="errors">
+                {% for error in form.shape.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <p>
+            {{ form.decimals.label }}
+            {{ form.decimals(style="background-color:#eceff1; text-align:center;", placeholder="0")}}
+        </p>
+        {% if form.decimals.errors %}
+            <ul class="errors">
+                {% for error in form.decimals.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+            <p>
+            {{ form.visualize.label }}      {{ form.visualize() }}
+            </p>
+            <p>
+                <button type="submit" class="btn btn-dark">Run</button>
+            </p>
+            <br/>
+        
+        {% if form.visualize.errors %}
+            <ul class="errors">
+                {% for error in form.visualize.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        
+
+    </form>
+{% endif %}
+{% endblock %}

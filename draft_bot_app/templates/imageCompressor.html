@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if data %}
+<center>
+    <div class = 'container'>
+        <h1> success. </h1>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card text-center" style="width: 85%;">
+                <img src="{{url_for('static', filename = 'images/lena_original.png')}}" class="card-img-top" alt = "Uncompressed Image">
+                <div class="card-body">
+                  <p class="card-text">Uncompressed image.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card text-center" style="width: 85%;">
+                <img src='data:image/png;base64,{{ data }}' class="card-img-top" alt = "Uncompressed Image">
+                <div class="card-body">
+                  <p class="card-text">Compressed image with {{n_components_prt}} of original quality.</p>
+                </div>
+            </div>
+        </div>
+      </div>  
+      <br/>
+</center>
+{% else %}
+    <div class="container">
+        <h1> choose an image to compress. </h1>
+        <form method="POST">
+            {{ form.csrf_token }}
+            <p>
+            <p>
+                {{ form.imgRows.label }}
+                {{ form.imgRows(class = 'form-control', style="background-color:#eceff1; width:7.5%") }}
+            </p>
+    
+            {% if form.imgRows.errors %}
+                <ul class="errors">
+                    {% for error in form.imgRows.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+    
+            <p>
+              {{ form.imgCols.label }}
+              {{ form.imgCols(class = 'form-control', style="background-color:#eceff1; width:7.5%") }}
+          </p>
+    
+          {% if form.imgCols.errors %}
+              <ul class="errors">
+                  {% for error in form.imgCols.errors %}
+                      <li>{{ error }}</li>
+                  {% endfor %}
+              </ul>
+          {% endif %}
+    
+            <p>
+                {{ form.varExplained.label }}
+                {{ form.varExplained(class="form-control", style="background-color:#eceff1; width:7.5%") }}
+            </p>
+    
+            {% if form.varExplained.errors %}
+                <ul class="errors">
+                    {% for error in form.varExplained.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+    
+            <p>
+                {{ form.imgSelection.label }}
+                {{ form.imgSelection(class="form-control", style="background-color:#eceff1; width:7.5%") }}
+            </p>
+    
+            {% if form.imgSelection.errors %}
+                <ul class="errors">
+                    {% for error in form.imgSelection.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+    
+            <p>
+                <input type="submit" value="Run">
+            </p>
+        </form>
+    </div>
+    <br/>
+{% endif %}
+{% endblock %}

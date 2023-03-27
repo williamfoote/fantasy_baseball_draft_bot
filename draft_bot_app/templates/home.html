@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content%}
+  <style>
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 7.5%;
+    }
+  </style>
+  <body>
+    <div class="center">
+      <center>
+          <img src="{{url_for('static', filename = 'images/minimage_icon.svg')}}" class="rounded mx-auto d-block" width="64" height="64">
+        <center/>
+        <br/>
+      <h1>welcome to minimage.</h1>
+    </div>
+    <div class = 'center'>
+      <h1>Turn Tracker</h1>
+      <form method="post">
+        {{ form.csrf_token }}
+        {{ form.name.label }} {{ form.name }}
+        <br>
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+    <div>
+      <center>
+      <p>because less memory used means more memories saved.</p>
+      <center/>
+    </div>
+{% endblock %}

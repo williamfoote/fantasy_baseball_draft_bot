@@ -9,15 +9,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-id_map_2 <- read.csv('id_map_2.csv')
-batc <- read.csv("bat_atc_23.csv")
+library(tidyverse)
+id_map_2 <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/data/id_map_2.csv')
+batc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/data/bat_atc_23.csv")
 batc <- left_join(batc, id_map_2[, c('POS', 'IDFANGRAPHS', 'UNDERDOG')], by = c('PlayerId' = 'IDFANGRAPHS'))
 batc$POS <- with(batc, ifelse(POS %in% c('1B', '2B', '3B', 'C', 'SS'), 'IF',
                               ifelse(POS %in% c('DH', 'OF', 'P'), 'OF', POS)))
-patc <- read.csv("pitch_atc_23.csv")
+patc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/data/pitch_atc_23.csv")
 patc <- left_join(patc, id_map_2[, c('POS', 'IDFANGRAPHS', 'UNDERDOG')], by = c('PlayerId' = 'IDFANGRAPHS')) 
-
-underdog <- read.csv('underdog_rankings_raw.csv')
+patc$POS <- with(patc, ifelse(SV + HLD > 3, 'RP', 'SP'))
+underdog <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_rankings_raw.csv')
 
 ```
 
@@ -42,8 +43,8 @@ get_points <- function(x, player_type = 'batter', cats, points) {
 
 #get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
            #points = matrix(c(5, 5, 3, 3, -3), ncol = 1))
-
-batc$proj_fpts <- get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB', 'HBP', 'RBI', 'R', 'SB'),
+batc$BB_2 <- with(batc, BB + IBB)
+batc$proj_fpts <- get_points(batc, cats = c('X1B', 'X2B', 'X3B', 'HR', 'BB_2', 'HBP', 'RBI', 'R', 'SB'),
            points = matrix(c(3, 6, 8, 10, 3, 3, 2, 2, 4), ncol = 1))
 
 patc$proj_fpts <- get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
@@ -51,20 +52,78 @@ patc$proj_fpts <- get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
 ```
 
 ```{r}
-combined_fpts <- rbind(batc[, c('UNDERDOG', 'Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')],
-      patc[, c('UNDERDOG', 'Name', 'Team', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')]) %>% 
+combined_fpts <- rbind(batc[, c('UNDERDOG', 'Name', 'Team', 'G', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')],
+      patc[, c('UNDERDOG', 'Name', 'Team', "G", 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')]) %>% 
   distinct(Name, Team, .keep_all = T) %>% 
   arrange(desc(proj_fpts))
 combined_fpts$rank <- 1:nrow(combined_fpts)
-
-combined_fpts[113, 'UNDERDOG'] = '5e2a3754-118c-47a7-b81e-51fb0c1ec8f3'
-combined_fpts[177, 'UNDERDOG'] = '44b1df17-224b-4fe3-98cd-dae156588aa6'
+combined_fpts$ppg <- with(combined_fpts, proj_fpts / G)
+combined_fpts$pos_2 <- with(combined_fpts, ifelse(POS %in% c('SP', 'RP'), 'P', ifelse(POS %in% c('IF', 'OF'), 'IF/OF', NA)))
+combined_fpts <- data.frame(combined_fpts %>% group_by(pos_2) %>% mutate(z_ppg = z_score(ppg)))
+                            
+# combined_fpts[combined_fpts$Name == 'Brandon Lowe', 'UNDERDOG'] = '5e2a3754-118c-47a7-b81e-51fb0c1ec8f3'
+# combined_fpts[combined_fpts$Name == 'Oscar Gonzalez', 'UNDERDOG'] = '44b1df17-224b-4fe3-98cd-dae156588aa6'
+# combined_fpts[combined_fpts$Name == 'Luis García', 'UNDERDOG'] = '2c46371b-4141-4729-bbd4-cd3dff0a7bb6'
+# combined_fpts[combined_fpts$Name == 'Jordan Walker', 'UNDERDOG'] = '2c46371b-4141-4729-bbd4-cd3dff0a7bb6'
+# combined_fpts[combined_fpts$Name == 'Oscar Colas', 'UNDERDOG'] = 
+# combined_fpts[combined_fpts$Name == 'Anthony Volpe', 'UNDERDOG'] = 
 
 #write.csv(combined_fpts, 'underdog_BB_mlb_rankings_23.csv')
 
-final <- left_join(combined_fpts, underdog, by = c('UNDERDOG' = 'id'))
-write.csv(final, 'underdog_BB_mlb_rankings_23.csv')
+# Rankings to send to draft sheet
+temp <- left_join(combined_fpts, underdog, by = c('UNDERDOG' = 'id'))
+final <- temp %>%
+  select(Name, Team, slotName, proj_fpts, z_ppg, adp, InterSD, InterSK, IntraSD, UNDERDOG)
+write.csv(final, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_BB_mlb_rankings_23.csv')
 
+# Using underdogs points
+
+final_using_UD_rankings <- temp %>%
+  select(Name, Team, slotName, projectedPoints) %>% 
+  arrange(desc(projectedPoints))
+names(final_using_UD_rankings) <- c("Name", "Team", "position", "points")
+write.csv(final_using_UD_rankings, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/mcts_players_UD_proj.csv',
+          row.names = FALSE)
+
+# Raw points for Bot
+final_mcts <- final %>%
+  select(Name, Team, slotName, proj_fpts) %>% 
+  arrange(desc(proj_fpts))
+names(final_mcts) <- c("Name", "Team", "position", "points")
+write.csv(final_mcts, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/mcts_players.csv', row.names = FALSE)
+
+# Z_ppg for Bot
+final_mcts_ppg <- final %>%
+  select(Name, Team, slotName, z_ppg) %>% 
+  arrange(desc(z_ppg))
+names(final_mcts_ppg) <- c("Name", "Team", "position", "points")
+
+write.csv(final_mcts_ppg, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/mcts_players_2.csv', row.names = FALSE)
+
+# Rankings to send to underdog
+temp2 <- temp %>% filter(!is.na(slotName)) %>%
+  group_by(slotName) %>%
+  arrange(desc(proj_fpts)) %>%
+  mutate(rank_pos = order(proj_fpts, decreasing=TRUE)) %>% 
+  filter(rank_pos < 100) %>%
+  mutate(z_score_fpts = z_score(proj_fpts)) %>% 
+  arrange(desc(z_score_fpts))
+
+export_to_underdog <- temp2 %>% 
+  select(UNDERDOG, firstName, lastName, adp, projectedPoints, positionRank, slotName, teamName, lineupStatus, byeWeek)
+names(export_to_underdog)[1] <- 'id'
+write.csv(export_to_underdog, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_rankings_updated.csv', row.names = FALSE)
+```
+
+# Turn underdog rankings into python form
+
+```{r}
+ud <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/raw/opening day.csv')
+ud$Name <- with(ud, paste(firstName, lastName))
+ud_export <- ud %>% 
+  select(Name, teamName, slotName, projectedPoints)
+write.csv(ud_export, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/cleaned/opening day.csv',
+          row.names = FALSE)
 
 ```
 

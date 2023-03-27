@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1> the technical documentation. </h1>
+    <br/>
+    <center>
+        <embed src="{{url_for('static', filename = 'minimageReadMe.pdf')}}" type="application/pdf" width="100%" height="600px" />
+    </center>
+    <br/><br/><br/>
+{% endblock %}
