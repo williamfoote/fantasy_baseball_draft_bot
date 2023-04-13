@@ -159,13 +159,11 @@ write.csv(ud_export, file = efn,
 ## Get names from python results
 
 ```{r}
-results = read.csv('/Users/williamfoote/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/results/4_13-early_results.csv')
+results = read.csv('/Users/williamfoote/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/results/4_13-late_results.csv')
 
 player_names = str_replace(results$Team.1, pattern = " ", replacement = "-")
 player_names = c(player_names, str_replace(results$Team.2, pattern = " ", replacement = "-"))
 player_names = c(player_names, str_replace(results$Team.3, pattern = " ", replacement = "-"))
-
-
 ```
 
 
@@ -173,16 +171,20 @@ player_names = c(player_names, str_replace(results$Team.3, pattern = " ", replac
 #library(rvest)
 
 for (i in seq_len(length(player_names))) {
-  this_player_name = stri_trans_general(str = player_names[i], id = "Latin-ASCII")
-  base_url <- "https://www.theshowratings.com/"
-  url = paste(base_url, this_player_name, sep = '')
-  imgsrc <- read_html(url) %>%
-    html_node(xpath = '/html/body/div[1]/div[2]/div[2]/div[3]/main/div/div[2]/div[1]/img') %>%
-    html_attr('src')
-  
-  # side-effect!
-  file_name = paste('/Users/williamfoote/Documents/tiktoks/player images/', strsplit(url, '/')[[1]][length(strsplit(url, '/')[[1]])], '.png', sep = '')
-  download.file(imgsrc, destfile = file_name)
+  if (i == 10) {
+    1
+  } else {
+    this_player_name = stri_trans_general(str = player_names[i], id = "Latin-ASCII")
+    base_url <- "https://www.theshowratings.com/"
+    url = paste(base_url, this_player_name, sep = '')
+    imgsrc <- read_html(url) %>%
+      html_node(xpath = '/html/body/div[1]/div[2]/div[2]/div[3]/main/div/div[2]/div[1]/img') %>%
+      html_attr('src')
+    
+    # side-effect!
+    file_name = paste('/Users/williamfoote/Documents/tiktoks/player images/', strsplit(url, '/')[[1]][length(strsplit(url, '/')[[1]])], '.png', sep = '')
+    download.file(imgsrc, destfile = file_name)
+  }
 }
 
 ```
