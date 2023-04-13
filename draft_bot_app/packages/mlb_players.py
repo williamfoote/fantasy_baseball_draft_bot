@@ -9,13 +9,17 @@ class DraftState:
         self.playerJustMoved = playerjm
 
 class MLBPlayer:
-    def __init__(self, name, team, position, points):
+    def __init__(self, name, team, position, points, adp, adj_pts):
         self.name = name
         self.team = team
         self.position = str(position)
         self.points = points
+        self.adp = adp
+        self.adj_pts = adj_pts
+        
     def __repr__(self):
-        return self.name
+        #return self.name
+        return "_".join([self.name, self.position, str(round(self.points)), 'pts'])
     def pop(self, index=-1) :
         return self.data.pop(index)
 
@@ -25,10 +29,10 @@ def GetResult(self, playerjm):
     if playerjm is None: return 0
     
     pos_wgts = {
-        ("IF"): [1],
-        ("OF"): [1],
-        ("P"): [1]
-        # ("IF", "OF"):[1]
+        ("IF"): [1, 1],
+        ("OF"): [1, 1],
+        ("P"): [1],
+        ("IF", "OF"):[.7]
         # ("SS"): [1],
         # ('3B'): [1],
         # # ("1B", "3B"): [.6, .4],
@@ -63,11 +67,11 @@ def GetMoves(self):
     """ Get all possible moves from this state.
     """
     
-    pos_max = {"IF": 4, "OF": 4, "P": 4}
+    pos_max = {"IF": 3, "OF": 3, "P": 1}
     if len(self.turns) == 0: return []
     roster_positions = np.array([p.position for p in self.rosters[self.turns[0]]], dtype=str)
-    # moves = [pos for pos, max_ in pos_max.items() if np.sum(roster_positions == pos) < max_]
-    moves = list(pos_max.keys())
+    moves = [pos for pos, max_ in pos_max.items() if np.sum(roster_positions == pos) < max_]
+    #moves = list(pos_max.keys())
     return moves
 DraftState.GetMoves = GetMoves
 
@@ -82,6 +86,32 @@ def DoMove(self, move):
     self.playerJustMoved = rosterId
     
 DraftState.DoMove = DoMove
+
+def DoGreedyMove(self, move):
+    """ Update a state by carrying out the greediest (most points at the moment) move.
+        Must update playerJustMoved.
+    """
+    # Get the next highest player from the eligible player pool (i.e. you can't draft an 8th IF if you have 7 already)
+    player = next(p for p in self.freeagents if p.position == move)
+    self.freeagents.remove(player)
+    rosterId = self.turns.pop(0)
+    self.rosters[rosterId].append(player)
+    self.playerJustMoved = rosterId
+    
+DraftState.DoGreedyMove = DoGreedyMove
+
+def DoAdpMove(self):
+    moves = self.GetMoves()
+    fa_subset = [p for p in self.freeagents if p.position in moves]
+    players = [np.random.normal(loc = p.adp) for p in self.freeagents if p.position in moves]
+    ind = players.index(min(players))
+    player = fa_subset[ind]
+    self.freeagents.remove(player)
+    rosterId = self.turns.pop(0)
+    self.rosters[rosterId].append(player)
+    self.playerJustMoved = rosterId
+
+DraftState.DoAdpMove = DoAdpMove
 
 def DoManualMove(self, player_name):
     """ Update a state by carrying out a specific move.
@@ -103,6 +133,23 @@ def Clone(self):
             self.playerJustMoved)
     return st
 DraftState.Clone = Clone
+
+# Add other strategies:
+
+def greedy_draft(self):
+    def result(move):
+        st = self.Clone()
+        st.DoMove(move)
+        return st.GetResult(st.playerJustMoved)
+    
+    res, move = max((result(m), m) for m in self.GetMoves())
+    return move
+DraftState.greedy_draft = greedy_draft
+
+def random_draft(self):
+    return np.random.choice(self.GetMoves())
+DraftState.random_draft = random_draft
+
 
 # This is a very simple implementation of the UCT Monte Carlo Tree Search algorithm in Python 2.7.
 # The function UCT(rootstate, itermax, verbose = False) is towards the bottom of the code.

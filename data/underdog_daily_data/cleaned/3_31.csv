@@ -1,0 +1,353 @@
+"Name","teamName","slotName","projectedPoints","final_adp","adp_adj_pts"
+"Juan Soto","San Diego Padres","OF",10.6,2,21.2
+"Julio Rodríguez","Seattle Mariners","OF",10.9,3.3,15.6391304347826
+"Yordan Alvarez","Houston Astros","OF",10.4,3.8,14.1142857142857
+"Manny Machado","San Diego Padres","IF",10.4,3.8,14.1142857142857
+"Cristian Javier","Houston Astros","P",11.9,6.6,14.025
+"Mookie Betts","Los Angeles Dodgers","OF",10.3,6,12.36
+"Robbie Ray","Seattle Mariners","P",10.7,10.5,11.8263157894737
+"Freddie Freeman","Los Angeles Dodgers","IF",9.7,5.8,11.7208333333333
+"Xander Bogaerts","San Diego Padres","IF",9.7,8.7,10.9597402597403
+"Dustin May","Los Angeles Dodgers","P",10,14.2,10.7575757575758
+"José Ramírez","Cleveland Guardians","IF",9.5,10.4,10.5106382978723
+"Kyle Tucker","Houston Astros","OF",9.5,11.8,10.3796296296296
+"Lance Lynn","Chicago White Sox","P",10,28.1,10.3690036900369
+"Kris Bryant","Colorado Rockies","OF",9.8,19.5,10.3297297297297
+"Jesús Luzardo","Miami Marlins","P",9.9,30.3,10.2378839590444
+"Jarred Kelenic","Seattle Mariners","OF",9.5,26.2,9.87698412698413
+"Will Smith","Los Angeles Dodgers","IF",9.2,15.6,9.83013698630137
+"Kolten Wong","Seattle Mariners","IF",9.4,28.9,9.73691756272401
+"C.J. Cron","Colorado Rockies","IF",9.2,21.7,9.64444444444444
+"Nelson Cruz","San Diego Padres","OF",9.3,29.4,9.6274647887324
+"Pete Alonso","New York Mets","IF",8.7,11.8,9.50555555555555
+"Eugenio Suárez","Seattle Mariners","IF",9.1,28,9.43703703703704
+"AJ Pollock","Seattle Mariners","OF",9.1,35.8,9.36149425287356
+"Francisco Lindor","New York Mets","IF",8.8,18.3,9.30867052023121
+"Starling Marte","New York Mets","OF",8.7,15.3,9.30839160839161
+"Jake Cronenworth","San Diego Padres","IF",9,32.5,9.28571428571429
+"Teoscar Hernández","Seattle Mariners","OF",8.8,19.3,9.28087431693989
+"Corbin Carroll","Arizona Diamondbacks","OF",8.9,30.6,9.20067567567568
+"Nick Martinez","San Diego Padres","P",8.9,32.3,9.18434504792332
+"Cal Raleigh","Seattle Mariners","IF",8.9,32.8,9.17987421383648
+"David Peterson","New York Mets","P",8.9,33.2,9.17639751552795
+"Mike Zunino","Cleveland Guardians","IF",8.8,36,9.05142857142857
+"Brandon Nimmo","New York Mets","OF",8.7,26,9.048
+"Ha-Seong Kim","San Diego Padres","IF",8.7,35.5,8.95217391304348
+"Merrill Kelly","Arizona Diamondbacks","P",8.7,35.7,8.9507204610951
+"Alex Bregman","Houston Astros","IF",8.5,20,8.94736842105263
+"Jazz Chisholm Jr.","Miami Marlins","OF",8.6,28.3,8.91501831501832
+"Ty France","Seattle Mariners","IF",8.6,29.6,8.9006993006993
+"Jorge Soler","Miami Marlins","OF",8.6,35.5,8.84927536231884
+"Austin Nola","San Diego Padres","IF",8.6,36,8.84571428571429
+"Max Muncy","Los Angeles Dodgers","IF",8.3,24,8.66086956521739
+"Garrett Cooper","Miami Marlins","IF",8.4,35.7,8.64207492795389
+"Mark Canha","New York Mets","OF",8.4,35.8,8.64137931034483
+"Jake McCarthy","Arizona Diamondbacks","OF",8.3,33.8,8.55304878048781
+"Ryan McMahon","Colorado Rockies","IF",8.3,34.8,8.54556213017752
+"Charlie Blackmon","Colorado Rockies","OF",8.2,34.1,8.44773413897281
+"Luis Arraez","Miami Marlins","IF",8.2,34.5,8.44477611940298
+"Amed Rosario","Cleveland Guardians","IF",8.2,35.4,8.43837209302326
+"Jon Berti","Miami Marlins","OF",8.2,35.6,8.43699421965318
+"Jean Segura","Miami Marlins","IF",8.2,35.8,8.43563218390805
+"Andrés Giménez","Cleveland Guardians","IF",8.2,35.8,8.43563218390805
+"Avisaíl García","Miami Marlins","OF",8.2,36,8.43428571428571
+"J.D. Martinez","Los Angeles Dodgers","OF",8.1,32.4,8.35796178343949
+"Nick Fortes","Miami Marlins","IF",8.1,35.3,8.33615160349854
+"José Abreu","Houston Astros","IF",8,31.7,8.26058631921824
+"Eloy Jiménez","Chicago White Sox","OF",8,34.9,8.23598820058997
+"Josh Bell","Cleveland Guardians","IF",8,35.3,8.2332361516035
+"Elehuris Montero","Colorado Rockies","IF",8,35.9,8.22922636103152
+"Trent Grisham","San Diego Padres","OF",7.9,34.8,8.13372781065089
+"Christian Walker","Arizona Diamondbacks","IF",7.9,35.1,8.1316715542522
+"David Peralta","Los Angeles Dodgers","OF",7.9,35.8,8.12701149425287
+"Yuli Gurriel","Miami Marlins","IF",7.9,36,8.12571428571429
+"Jeremy Peña","Houston Astros","IF",7.8,31.7,8.05407166123778
+"Tommy Pham","New York Mets","OF",7.8,35.8,8.02413793103448
+"Eduardo Escobar","New York Mets","IF",7.8,35.9,8.02349570200573
+"Miguel Vargas","Los Angeles Dodgers","IF",7.8,36,8.02285714285714
+"Josh Rojas","Arizona Diamondbacks","IF",7.7,35.9,7.92063037249284
+"Ketel Marte","Arizona Diamondbacks","IF",7.6,35.6,7.81965317919075
+"Luis Robert Jr.","Chicago White Sox","OF",7.5,32.7,7.73659305993691
+"Hunter Gaddis","Cleveland Guardians","P",7.5,35.8,7.71551724137931
+"Yonathan Daza","Colorado Rockies","OF",7.5,35.9,7.71489971346705
+"James Outman","Los Angeles Dodgers","OF",7.4,32.6,7.63417721518987
+"Tim Anderson","Chicago White Sox","IF",7.4,35.1,7.61700879765396
+"Lourdes Gurriel Jr.","Arizona Diamondbacks","OF",7.4,35.9,7.61203438395416
+"Jeff McNeil","New York Mets","IF",7.3,35.8,7.50977011494253
+"David Hensley","Houston Astros","IF",7.3,36,7.50857142857143
+"J.P. Crawford","Seattle Mariners","IF",7.2,36,7.40571428571429
+"Oscar Gonzalez","Cleveland Guardians","OF",7.1,35.6,7.30520231213873
+"Steven Kwan","Cleveland Guardians","OF",7,35.2,7.2046783625731
+"Elias Díaz","Colorado Rockies","IF",7,36,7.2
+"Andrew Benintendi","Chicago White Sox","OF",6.9,35.8,7.09827586206897
+"Corey Julks","Houston Astros","OF",6.9,35.9,7.09770773638968
+"Kyle Freeland","Colorado Rockies","P",6.9,36,7.09714285714286
+"Yasmani Grandal","Chicago White Sox","IF",6.9,36,7.09714285714286
+"Gavin Sheets","Chicago White Sox","OF",6.9,36,7.09714285714286
+"José Azocar","San Diego Padres","OF",6.8,36,6.99428571428571
+"Josh Naylor","Cleveland Guardians","IF",6.7,36,6.89142857142857
+"Jake Meyers","Houston Astros","OF",6.6,36,6.78857142857143
+"Yoán Moncada","Chicago White Sox","IF",6.6,36,6.78857142857143
+"Ezequiel Tovar","Colorado Rockies","IF",6.6,36,6.78857142857143
+"Miguel Rojas","Los Angeles Dodgers","IF",6.4,36,6.58285714285714
+"Harold Castro","Colorado Rockies","IF",6.4,36,6.58285714285714
+"Gabriel Moreno","Arizona Diamondbacks","IF",6.3,36,6.48
+"Tomás Nido","New York Mets","IF",6.1,36,6.27428571428571
+"Alek Thomas","Arizona Diamondbacks","OF",6.1,36,6.27428571428571
+"Martín Maldonado","Houston Astros","IF",5.8,36,5.96571428571429
+"Myles Straw","Cleveland Guardians","OF",5.6,36,5.76
+"Elvis Andrus","Chicago White Sox","IF",5.5,36,5.65714285714286
+"Geraldo Perdomo","Arizona Diamondbacks","IF",5.4,36,5.55428571428572
+"Trayce Thompson","Los Angeles Dodgers","OF",3.3,36,3.39428571428571
+"Gabriel Arias","Cleveland Guardians","IF",3.1,36,3.18857142857143
+"Matt Carpenter","San Diego Padres","OF",2.9,36,2.98285714285714
+"Tim Locastro","New York Mets","OF",2.8,36,2.88
+"Cooper Hummel","Seattle Mariners","OF",2.8,36,2.88
+"Sam Haggerty","Seattle Mariners","OF",2.7,36,2.77714285714286
+"Kyle Lewis","Arizona Diamondbacks","OF",2.7,36,2.77714285714286
+"Jurickson Profar","Colorado Rockies","OF",2.6,36,2.67428571428571
+"Chas McCormick","Houston Astros","OF",2.5,36,2.57142857142857
+"Will Brennan","Cleveland Guardians","OF",2.5,36,2.57142857142857
+"Mike Moustakas","Colorado Rockies","OF",2.4,36,2.46857142857143
+"Seby Zavala","Chicago White Sox","IF",2.2,36,2.26285714285714
+"Nick Ahmed","Arizona Diamondbacks","IF",2.1,36,2.16
+"Omar Narváez","New York Mets","IF",2.1,36,2.16
+"Brian Serven","Colorado Rockies","IF",2,36,2.05714285714286
+"David Dahl","San Diego Padres","OF",1.9,1000,1.9019019019019
+"Romy González","Chicago White Sox","IF",1.8,1000,1.8018018018018
+"Hanser Alberto","Chicago White Sox","IF",1.7,1000,1.7017017017017
+"Jose Herrera","Arizona Diamondbacks","IF",1.3,1000,1.3013013013013
+"Evan Phillips","Los Angeles Dodgers","P",0.7,36,0.72
+"Hector Neris","Houston Astros","P",0.7,36,0.72
+"Andrew Chafin","Arizona Diamondbacks","P",0.6,36,0.617142857142857
+"A.J. Puk","Miami Marlins","P",0.6,36,0.617142857142857
+"Dylan Floro","Miami Marlins","P",0.5,36,0.514285714285714
+"Kendall Graveman","Chicago White Sox","P",0.5,36,0.514285714285714
+"Brad Hand","Colorado Rockies","P",0.5,36,0.514285714285714
+"Josh Hader","San Diego Padres","P",0.4,36,0.411428571428571
+"Dennis Santana","New York Mets","P",0.4,36,0.411428571428571
+"James Karinchak","Cleveland Guardians","P",0.4,36,0.411428571428571
+"Clayton Kershaw","Los Angeles Dodgers","P",0,1000,0
+"Luis Castillo","Seattle Mariners","P",0,1000,0
+"Julio Urías","Los Angeles Dodgers","P",0,1000,0
+"Xzavion Curry","Cleveland Guardians","P",0,1000,0
+"Trevor Gott","Seattle Mariners","P",0,1000,0
+"Stephen Nogosek","New York Mets","P",0,1000,0
+"Domingo Tapia","San Diego Padres","P",0,1000,0
+"Andre Jackson","Los Angeles Dodgers","P",0,1000,0
+"Jake Bird","Colorado Rockies","P",0,1000,0
+"Shelby Miller","Los Angeles Dodgers","P",0,1000,0
+"Andrew Nardi","Miami Marlins","P",0,1000,0
+"Ryan Pepiot","Los Angeles Dodgers","P",0,1000,0
+"Michel Baez","","P",0,1000,0
+"Cody Morris","Cleveland Guardians","P",0,1000,0
+"José Butto","New York Mets","P",0,1000,0
+"Alex Reyes","Los Angeles Dodgers","P",0,1000,0
+"Mike Clevinger","Chicago White Sox","P",0,1000,0
+"Blake Snell","San Diego Padres","P",0,1000,0
+"Sixto Sánchez","Miami Marlins","P",0,1000,0
+"Lance McCullers Jr.","Houston Astros","P",0,1000,0
+"Justin Topa","Seattle Mariners","P",0,1000,0
+"Justin Bruihl","Los Angeles Dodgers","P",0,1000,0
+"Korey Lee","Houston Astros","IF",0,1000,0
+"Michael Wacha","San Diego Padres","P",0,1000,0
+"Ryan Weathers","San Diego Padres","P",0,1000,0
+"Joe Musgrove","San Diego Padres","P",0,1000,0
+"Sam Coonrod","New York Mets","P",0,1000,0
+"Logan Gilbert","Seattle Mariners","P",0,1000,0
+"Brandon Bielak","Houston Astros","P",0,1000,0
+"Framber Valdez","Houston Astros","P",0,1000,0
+"Anthony Bender","Miami Marlins","P",0,1000,0
+"Tayler Saucedo","Seattle Mariners","P",0,1000,0
+"Pedro Avila","San Diego Padres","P",0,1000,0
+"Adrian Morejon","San Diego Padres","P",0,1000,0
+"Robert Suarez","San Diego Padres","P",0,1000,0
+"Michael Brantley","Houston Astros","OF",0,1000,0
+"Nic Enright","Miami Marlins","P",0,1000,0
+"Tanner Banks","Chicago White Sox","P",0,1000,0
+"Konnor Pilkington","Cleveland Guardians","P",0,1000,0
+"José Urquidy","Houston Astros","P",0,1000,0
+"Sam Hentges","Cleveland Guardians","P",0,1000,0
+"Walker Buehler","Los Angeles Dodgers","P",0,1000,0
+"Max Meyer","Miami Marlins","P",0,1000,0
+"Zach Davies","Arizona Diamondbacks","P",0,1000,0
+"Luis Frías","Arizona Diamondbacks","P",0,1000,0
+"Jose Altuve","Houston Astros","IF",0,1000,0
+"Aaron Civale","Cleveland Guardians","P",0,1000,0
+"Johnny Cueto","Miami Marlins","P",0,1000,0
+"Ray Kerr","San Diego Padres","P",0,1000,0
+"Peter Lambert","Colorado Rockies","P",0,1000,0
+"George Kirby","Seattle Mariners","P",0,1000,0
+"Enoli Paredes","Houston Astros","P",0,1000,0
+"Taylor Trammell","Seattle Mariners","OF",0,1000,0
+"Edward Cabrera","Miami Marlins","P",0,1000,0
+"Germán Márquez","Colorado Rockies","P",0,1000,0
+"Cal Quantrill","Cleveland Guardians","P",0,1000,0
+"Kodai Senga","New York Mets","P",0,1000,0
+"Liam Hendriks","Chicago White Sox","P",0,1000,0
+"Parker Mushinski","Houston Astros","P",0,1000,0
+"Brent Honeywell Jr.","San Diego Padres","P",0,1000,0
+"Ryan Feltner","Colorado Rockies","P",0,1000,0
+"Tyler Kinley","Colorado Rockies","P",0,1000,0
+"Frank German","Chicago White Sox","P",0,1000,0
+"Fernando Tatis Jr.","San Diego Padres","IF",0,1000,0
+"Jonathan Stiever","Chicago White Sox","P",0,1000,0
+"Stephen Ridings","New York Mets","P",0,1000,0
+"Shane Bieber","Cleveland Guardians","P",0,1000,0
+"Daniel Hudson","Los Angeles Dodgers","P",0,1000,0
+"Brennan Bernardino","Seattle Mariners","P",0,1000,0
+"Zac Gallen","Arizona Diamondbacks","P",0,1000,0
+"Joey Lucchesi","New York Mets","P",0,1000,0
+"Gavin Hollowell","Colorado Rockies","P",0,1000,0
+"Easton McGee","Seattle Mariners","P",0,1000,0
+"Joey Cantillo","Cleveland Guardians","P",0,1000,0
+"Bligh Madris","","OF",0,1000,0
+"Brendan Rodgers","Colorado Rockies","IF",0,1000,0
+"Michael Grove","Los Angeles Dodgers","P",0,1000,0
+"José Ureña","Colorado Rockies","P",0,1000,0
+"Garrett Crochet","Chicago White Sox","P",0,1000,0
+"Michael Toglia","Colorado Rockies","OF",0,1000,0
+"Blake Taylor","Houston Astros","P",0,1000,0
+"Dylan Moore","Seattle Mariners","OF",0,1000,0
+"Nick Avila","","P",0,1000,0
+"Joe Mantiply","Arizona Diamondbacks","P",0,1000,0
+"Yu Darvish","San Diego Padres","P",0,1000,0
+"Davis Martin","Chicago White Sox","P",0,1000,0
+"Carson Kelly","Arizona Diamondbacks","IF",0,1000,0
+"J.J. Matijevic","","IF",0,1000,0
+"Edwin Díaz","New York Mets","P",0,1000,0
+"Blake Treinen","Los Angeles Dodgers","P",0,1000,0
+"Adam Engel","San Diego Padres","OF",0,1000,0
+"Drew Pomeranz","San Diego Padres","P",0,1000,0
+"Julio Teheran","","P",0,1000,0
+"Tommy Henry","Arizona Diamondbacks","P",0,1000,0
+"Ronel Blanco","Houston Astros","P",0,1000,0
+"Victor González","Los Angeles Dodgers","P",0,1000,0
+"Luis Garcia","Houston Astros","P",0,1000,0
+"Justin Verlander","New York Mets","P",0,1000,0
+"Marco Gonzales","Seattle Mariners","P",0,1000,0
+"Randal Grichuk","Colorado Rockies","OF",0,1000,0
+"Bryce Montes de Oca","New York Mets","P",0,1000,0
+"Corbin Martin","Arizona Diamondbacks","P",0,1000,0
+"Nick Mears","Colorado Rockies","P",0,1000,0
+"Sandy Alcantara","Miami Marlins","P",0,1000,0
+"Austin Gomber","Colorado Rockies","P",0,1000,0
+"Reiss Knehr","San Diego Padres","P",0,1000,0
+"Lucas Gilbreath","Colorado Rockies","P",0,1000,0
+"Dylan Cease","Chicago White Sox","P",0,1000,0
+"Madison Bumgarner","Arizona Diamondbacks","P",0,1000,0
+"Noah Syndergaard","Los Angeles Dodgers","P",0,1000,0
+"Eguy Rosario","San Diego Padres","IF",0,1000,0
+"Sean Bouchard","Colorado Rockies","IF",0,1000,0
+"Rylan Bannon","Houston Astros","IF",0,1000,0
+"Steven Okert","Miami Marlins","P",0,1000,0
+"Noah Davis","Colorado Rockies","P",0,1000,0
+"Tony Gonsolin","Los Angeles Dodgers","P",0,1000,0
+"Antonio Senzatela","Colorado Rockies","P",0,1000,0
+"Michael Kopech","Chicago White Sox","P",0,1000,0
+"Carlos Carrasco","New York Mets","P",0,1000,0
+"Seth Lugo","San Diego Padres","P",0,1000,0
+"Lucas Giolito","Chicago White Sox","P",0,1000,0
+"Nick Padilla","Chicago White Sox","P",0,1000,0
+"Leury García","","IF",0,1000,0
+"Jake Burger","Chicago White Sox","IF",0,1000,0
+"Zach Plesac","Cleveland Guardians","P",0,1000,0
+"Gabe Speier","Seattle Mariners","P",0,1000,0
+"Tommy Nance","Miami Marlins","P",0,1000,0
+"Jimmy Nelson","Los Angeles Dodgers","P",0,1000,0
+"Jeff Brigham","New York Mets","P",0,1000,0
+"Mark Melancon","Arizona Diamondbacks","P",0,1000,0
+"Matt Foster","Chicago White Sox","P",0,1000,0
+"Hunter Brown","Houston Astros","P",0,1000,0
+"Max Scherzer","New York Mets","P",0,1000,0
+"Daniel Bard","Colorado Rockies","P",0,1000,0
+"Trevor Rogers","Miami Marlins","P",0,1000,0
+"Tylor Megill","New York Mets","P",0,1000,0
+"J.P. Feyereisen","Los Angeles Dodgers","P",0,1000,0
+"Ryne Nelson","Arizona Diamondbacks","P",0,1000,0
+"Triston McKenzie","Cleveland Guardians","P",0,1000,0
+"José Quintana","New York Mets","P",0,1000,0
+"Gavin Lux","Los Angeles Dodgers","IF",0,1000,0
+"José Castillo","San Diego Padres","P",0,1000,0
+"Matt Gage","Houston Astros","P",0,1000,0
+"A.J. Alexy","Chicago White Sox","P",0,1000,0
+"Elieser Hernández","New York Mets","P",0,1000,0
+"Gregory Santos","Chicago White Sox","P",0,1000,0
+"Ty Blach","Colorado Rockies","P",0,1000,0
+"Connor Seabold","Colorado Rockies","P",0,1000,0
+"Luis Campusano","San Diego Padres","IF",2.8,NA,NA
+"Tommy La Stella","Seattle Mariners","IF",2.7,NA,NA
+"Chris Taylor","Los Angeles Dodgers","IF",2.7,NA,NA
+"Tom Murphy","Seattle Mariners","IF",2.5,NA,NA
+"Evan Longoria","Arizona Diamondbacks","IF",2.5,NA,NA
+"Andrew Vaughn","Chicago White Sox","IF",2.4,NA,NA
+"Rougned Odor","San Diego Padres","IF",2.4,NA,NA
+"Joey Wendle","Miami Marlins","IF",2.4,NA,NA
+"Alan Trejo","Colorado Rockies","IF",2.4,NA,NA
+"Jason Heyward","Los Angeles Dodgers","OF",2.4,NA,NA
+"Bryan De La Cruz","Miami Marlins","OF",2.4,NA,NA
+"Austin Barnes","Los Angeles Dodgers","IF",2.3,NA,NA
+"Jacob Stallings","Miami Marlins","IF",2.3,NA,NA
+"Yainer Diaz","Houston Astros","IF",2.3,NA,NA
+"Daniel Vogelbach","New York Mets","OF",2.1,NA,NA
+"Jesús Sánchez","Miami Marlins","OF",2.1,NA,NA
+"Mauricio Dubón","Houston Astros","IF",2,NA,NA
+"Luis Guillorme","New York Mets","IF",2,NA,NA
+"Meibrys Viloria","Cleveland Guardians","IF",1.9,NA,NA
+"Cam Gallagher","Cleveland Guardians","IF",1.9,NA,NA
+"Ryan Pressly","Houston Astros","P",0.7,NA,NA
+"Drey Jameson","Arizona Diamondbacks","P",0.7,NA,NA
+"Adam Ottavino","New York Mets","P",0.7,NA,NA
+"Dinelson Lamet","Colorado Rockies","P",0.7,NA,NA
+"Emmanuel Clase","Cleveland Guardians","P",0.7,NA,NA
+"Ryne Stanek","Houston Astros","P",0.6,NA,NA
+"Phil Maton","Houston Astros","P",0.6,NA,NA
+"Tanner Scott","Miami Marlins","P",0.6,NA,NA
+"Jake Diekman","Chicago White Sox","P",0.6,NA,NA
+"Diego Castillo","Seattle Mariners","P",0.6,NA,NA
+"Eli Morgan","Cleveland Guardians","P",0.6,NA,NA
+"Nabil Crismatt","San Diego Padres","P",0.6,NA,NA
+"Tim Herrin","Cleveland Guardians","P",0.6,NA,NA
+"Braxton Garrett","Miami Marlins","P",0.6,NA,NA
+"Rafael Montero","Houston Astros","P",0.6,NA,NA
+"Carlos Vargas","Arizona Diamondbacks","P",0.6,NA,NA
+"Brent Suter","Colorado Rockies","P",0.5,NA,NA
+"Reynaldo López","Chicago White Sox","P",0.5,NA,NA
+"Brusdar Graterol","Los Angeles Dodgers","P",0.5,NA,NA
+"José Ruiz","Chicago White Sox","P",0.5,NA,NA
+"Alex Vesia","Los Angeles Dodgers","P",0.4,NA,NA
+"Andrés Muñoz","Seattle Mariners","P",0.3,NA,NA
+"Trevor Stephan","Cleveland Guardians","P",0.3,NA,NA
+"Bryan Abreu","Houston Astros","P",0.3,NA,NA
+"Paul Sewald","Seattle Mariners","P",0.3,NA,NA
+"David Robertson","New York Mets","P",0.2,NA,NA
+"Miguel Castro","Arizona Diamondbacks","P",0.2,NA,NA
+"Pierce Johnson","Colorado Rockies","P",0.2,NA,NA
+"Matt Barnes","Miami Marlins","P",0.2,NA,NA
+"Brooks Raley","New York Mets","P",0.2,NA,NA
+"Enyel De Los Santos","Cleveland Guardians","P",0.2,NA,NA
+"Phil Bickford","Los Angeles Dodgers","P",0.2,NA,NA
+"Scott McGough","Arizona Diamondbacks","P",0.2,NA,NA
+"Drew Smith","New York Mets","P",0.2,NA,NA
+"Luis García","San Diego Padres","P",0.2,NA,NA
+"Aaron Bummer","Chicago White Sox","P",0.2,NA,NA
+"Nick Sandlin","Cleveland Guardians","P",0.2,NA,NA
+"Tim Hill","San Diego Padres","P",0.2,NA,NA
+"Chris Flexen","Seattle Mariners","P",0.2,NA,NA
+"Cole Sulser","Arizona Diamondbacks","P",0.2,NA,NA
+"Caleb Ferguson","Los Angeles Dodgers","P",0.2,NA,NA
+"Yency Almonte","Los Angeles Dodgers","P",0.1,NA,NA
+"Penn Murfee","Seattle Mariners","P",0.1,NA,NA
+"Steven Wilson","San Diego Padres","P",0.1,NA,NA
+"JT Chargois","Miami Marlins","P",0.1,NA,NA
+"Joe Kelly","Chicago White Sox","P",0.1,NA,NA
+"John Curtiss","New York Mets","P",0.1,NA,NA
+"Matt Brash","Seattle Mariners","P",0.1,NA,NA
+"Matt Festa","Seattle Mariners","P",0.1,NA,NA
+"Seth Martinez","Houston Astros","P",0.1,NA,NA
+"Jimmy Lambert","Chicago White Sox","P",0.1,NA,NA
+"Huascar Brazoban","Miami Marlins","P",0.1,NA,NA
+"Tommy Hunter","New York Mets","P",0.1,NA,NA
+"Kevin Ginkel","Arizona Diamondbacks","P",0.1,NA,NA
+"Justin Lawrence","Colorado Rockies","P",0.1,NA,NA
+"Kyle Nelson","Arizona Diamondbacks","P",0.1,NA,NA

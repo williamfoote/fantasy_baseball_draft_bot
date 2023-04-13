@@ -52,8 +52,8 @@ patc$proj_fpts <- get_points(patc, cats = c('W', 'QS', 'SO', 'IP', 'ER'),
 ```
 
 ```{r}
-combined_fpts <- rbind(batc[, c('UNDERDOG', 'Name', 'Team', 'G', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')],
-      patc[, c('UNDERDOG', 'Name', 'Team', "G", 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')]) %>% 
+combined_fpts <- rbind(batc[, c('UNDERDOG', 'PlayerId', 'Name', 'Team', 'G', 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')],
+      patc[, c('UNDERDOG', 'PlayerId', 'Name', 'Team', "G", 'proj_fpts', 'POS', 'InterSD', 'InterSK', 'IntraSD')]) %>% 
   distinct(Name, Team, .keep_all = T) %>% 
   arrange(desc(proj_fpts))
 combined_fpts$rank <- 1:nrow(combined_fpts)
@@ -73,7 +73,7 @@ combined_fpts <- data.frame(combined_fpts %>% group_by(pos_2) %>% mutate(z_ppg =
 # Rankings to send to draft sheet
 temp <- left_join(combined_fpts, underdog, by = c('UNDERDOG' = 'id'))
 final <- temp %>%
-  select(Name, Team, slotName, proj_fpts, z_ppg, adp, InterSD, InterSK, IntraSD, UNDERDOG)
+  select(Name, Team, slotName, proj_fpts, z_ppg, adp, InterSD, InterSK, IntraSD, UNDERDOG, PlayerId)
 write.csv(final, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_BB_mlb_rankings_23.csv')
 
 # Using underdogs points
@@ -118,12 +118,72 @@ write.csv(export_to_underdog, '~/Documents/GitHub/fantasy_baseball_draft_bot/dat
 # Turn underdog rankings into python form
 
 ```{r}
-ud <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/raw/opening day.csv')
+file_name = '4_13-late.csv'
+
+rfn = paste('~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/raw/',
+            file_name, sep = '')
+efn = paste('~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/cleaned/',
+            file_name, sep = '')
+ud <- read.csv(file = rfn)
+# Cleaning
 ud$Name <- with(ud, paste(firstName, lastName))
+## Impute adps
+# 1) If they have 0 proj points, impute this with 1000 (an arbitrary high number)
+ud[ud$projectedPoints == 0, 'adp'] <- 1000
+# 2) If they have proj points, impute it using the players similar to them in 
+# position and projected points
+ud <- ud %>%
+  arrange(desc(projectedPoints)) %>%
+  group_by(slotName) %>% 
+  mutate(rank_pos = row_number()) %>%  
+  mutate(bin = cut(rank_pos, seq(min(rank_pos), max(rank_pos) + 4, 4), right = FALSE)) %>%
+  group_by(slotName, bin) %>%  
+  mutate(avg_bin_adp = median(adp, na.rm = T)) %>% 
+  mutate(final_adp = if_else(!is.na(adp), adp, avg_bin_adp)) %>% 
+  mutate(dif = final_adp - avg_bin_adp) %>% 
+  ungroup()
+
+ud <- ud %>% 
+  mutate(adp_adj_pts = (1/(1-(1/final_adp))) * projectedPoints)
 ud_export <- ud %>% 
-  select(Name, teamName, slotName, projectedPoints)
-write.csv(ud_export, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/cleaned/opening day.csv',
+  select(Name, teamName, slotName, projectedPoints, final_adp, adp_adj_pts) %>% 
+  arrange(desc(projectedPoints), final_adp)
+
+
+write.csv(ud_export, file = efn,
           row.names = FALSE)
+```
+
+# Download headshots from mlb ratings
+
+## Get names from python results
+
+```{r}
+results = read.csv('/Users/williamfoote/Documents/GitHub/fantasy_baseball_draft_bot/data/underdog_daily_data/results/4_13-early_results.csv')
+
+player_names = str_replace(results$Team.1, pattern = " ", replacement = "-")
+player_names = c(player_names, str_replace(results$Team.2, pattern = " ", replacement = "-"))
+player_names = c(player_names, str_replace(results$Team.3, pattern = " ", replacement = "-"))
+
+
+```
+
+
+```{r}
+#library(rvest)
+
+for (i in seq_len(length(player_names))) {
+  this_player_name = stri_trans_general(str = player_names[i], id = "Latin-ASCII")
+  base_url <- "https://www.theshowratings.com/"
+  url = paste(base_url, this_player_name, sep = '')
+  imgsrc <- read_html(url) %>%
+    html_node(xpath = '/html/body/div[1]/div[2]/div[2]/div[3]/main/div/div[2]/div[1]/img') %>%
+    html_attr('src')
+  
+  # side-effect!
+  file_name = paste('/Users/williamfoote/Documents/tiktoks/player images/', strsplit(url, '/')[[1]][length(strsplit(url, '/')[[1]])], '.png', sep = '')
+  download.file(imgsrc, destfile = file_name)
+}
 
 ```
 

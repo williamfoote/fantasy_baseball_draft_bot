@@ -1,0 +1,11 @@
+---
+title: "MLB Data Analysis - Daily Projection Development"
+output: html_document
+date: "2023-04-02"
+---
+
+```{r}
+# install.packages('baseballr')
+library(baseballr)
+```
+
