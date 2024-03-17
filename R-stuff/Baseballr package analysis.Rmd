@@ -20,66 +20,118 @@ We need this to join to game log data by player.
 game_data_apr_1 = mlb_game_pks(as.Date('2023-04-01'))
 ```
 
-Joining game log data to player data will have to be something like:
-  #1. Get the opposing team
-    - if equal to the player's team, then it's a home game
-    - else it's at the opposing team
-    - join team abbreviation (NYY or @TOR) to park id somehow
-  #2. Find the opposing starting pitcher?
-    - maybe get probable pitcher function
-    - join pitcher logs to game log and then join this to the batter logs
-  #3. Get player game log to game id: 
-    - Match location (using #1), date (assume only one game per day)
-# Feature Engineering
-
-## Park factors
 
 ```{r}
-fg_park(2022)
-# fg_park_hand(yr) gets the park factor for hitter handedness
-```
-# Get batter and pitcher game logs for each id that shows up in underdog
+# Define the date range
+start_date <- as.Date("2023-01-01")  # Start date
+end_date <- as.Date("2023-11-30")    # End date
 
-```{r}
-batter_df = fg_batter_game_logs(15640, year = 2022)
-pitcher_df = fg_pitcher_game_logs(playerid = 13125, year = 2022)
-for (i in seq_len(nrow(final))) {
-  if (is.na(final[i, 'slotName'][[1]]) | (final[i, 'proj_fpts'][[1]] < 500)) {
-    1
-  } else if (final[i, 'slotName'][[1]] == 'P') {
-    this_pitcher_id = as.numeric(final[i, 'PlayerId'][[1]])
-    for (j in c(2019, 2020, 2021, 2022)) {
-      this_pitcher_df = fg_pitcher_game_logs(playerid = this_pitcher_id, year = j)
-      pitcher_df = rbind(pitcher_df, this_pitcher_df, fill = TRUE)
+# Create a sequence of dates
+date_seq <- seq.Date(from=start_date, to=end_date, by="day")
+
+# Initialize dataframe for pbp data
+pbp_data23 <- data.frame()
+
+# Loop over the indices of the date sequence
+for (i in 1:length(date_seq)) {
+    # Extract the date using the index
+    date <- date_seq[i]
+
+    # Fetch game IDs for the current date
+    day_game_ids <- mlb_game_pks(date)
+
+    # Check if there are games on that day
+    if (!'tbl' %in% class(day_game_ids)) {
+        next  # Skip to the next date if there are no games
     }
-  } else {
-    this_batter_id = as.numeric(final[i, 'PlayerId'][[1]])
-    for (j in c(2019, 2020, 2021, 2022)) {
-      this_batter_df = fg_batter_game_logs(this_batter_id, year = 2022)
-      batter_df = rbind(batter_df, this_batter_df, fill = TRUE)
+
+    # Fetch play-by-play data for each game
+    for (game_id in day_game_ids[[1]]) {
+        game_data <- tryCatch({
+            mlb_pbp(game_id)
+        }, error = function(e) {
+            NULL  # In case of error, return NULL
+        })
+
+        # If game_data is not NULL, append it to the pbp_data dataframe
+        if (!is.null(game_data)) {
+          game_data[] <- lapply(game_data, function(x) if(is.factor(x)) as.character(x) else x)
+          pbp_data23 <- rbind(pbp_data23, game_data, fill = TRUE)
+        }
     }
-  }
 }
 
-pitcher_df = pitcher_df %>% distinct()
-batter_df = batter_df %>% distinct()
-saveRDS(batter_df, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/batter_game_logs.RDS')
-saveRDS(pitcher_df, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/pitcher_game_logs.RDS')
+# Save or store data
+# write.csv(pbp_data, "pbp_data.csv")
+# or use DBI package for database interaction
+# or saveRDS for binary R format
 
 ```
 
-## Clean pitcher data
-
 ```{r}
-pitcher_df <- readRDS('~/Documents/GitHub/fantasy_baseball_draft_bot/data/pitcher_game_logs.RDS')
-pitcher_df <- pitcher_df %>% mutate(QS = ifelse((GS == 1) & (IP >= 6) & (ER <=3), 1, 0))
-pitcher_df <- pitcher_df %>% mutate(underdog_fpts = W * 2 + QS * 3 + SO + (floor(IP)+((IP - floor(IP))*(1/3))) - ER)
+saveRDS(pbp_data23, '~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/pbp_data/pbp_2023.rds')
+```
+
+<!-- Joining game log data to player data will have to be something like: -->
+<!--   #1. Get the opposing team -->
+<!--     - if equal to the player's team, then it's a home game -->
+<!--     - else it's at the opposing team -->
+<!--     - join team abbreviation (NYY or @TOR) to park id somehow -->
+<!--   #2. Find the opposing starting pitcher? -->
+<!--     - maybe get probable pitcher function -->
+<!--     - join pitcher logs to game log and then join this to the batter logs -->
+<!--   #3. Get player game log to game id:  -->
+<!--     - Match location (using #1), date (assume only one game per day) -->
+<!-- # Feature Engineering -->
+
+<!-- ## Park factors -->
+
+<!-- ```{r} -->
+<!-- fg_park(2022) -->
+<!-- # fg_park_hand(yr) gets the park factor for hitter handedness -->
+<!-- ``` -->
+<!-- # Get batter and pitcher game logs for each id that shows up in underdog -->
+
+<!-- ```{r} -->
+<!-- batter_df = fg_batter_game_logs(15640, year = 2022) -->
+<!-- pitcher_df = fg_pitcher_game_logs(playerid = 13125, year = 2022) -->
+<!-- for (i in seq_len(nrow(final))) { -->
+<!--   if (is.na(final[i, 'slotName'][[1]]) | (final[i, 'proj_fpts'][[1]] < 500)) { -->
+<!--     1 -->
+<!--   } else if (final[i, 'slotName'][[1]] == 'P') { -->
+<!--     this_pitcher_id = as.numeric(final[i, 'PlayerId'][[1]]) -->
+<!--     for (j in c(2019, 2020, 2021, 2022)) { -->
+<!--       this_pitcher_df = fg_pitcher_game_logs(playerid = this_pitcher_id, year = j) -->
+<!--       pitcher_df = rbind(pitcher_df, this_pitcher_df, fill = TRUE) -->
+<!--     } -->
+<!--   } else { -->
+<!--     this_batter_id = as.numeric(final[i, 'PlayerId'][[1]]) -->
+<!--     for (j in c(2019, 2020, 2021, 2022)) { -->
+<!--       this_batter_df = fg_batter_game_logs(this_batter_id, year = 2022) -->
+<!--       batter_df = rbind(batter_df, this_batter_df, fill = TRUE) -->
+<!--     } -->
+<!--   } -->
+<!-- } -->
+
+<!-- pitcher_df = pitcher_df %>% distinct() -->
+<!-- batter_df = batter_df %>% distinct() -->
+<!-- saveRDS(batter_df, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/batter_game_logs.RDS') -->
+<!-- saveRDS(pitcher_df, '~/Documents/GitHub/fantasy_baseball_draft_bot/data/pitcher_game_logs.RDS') -->
+
+<!-- ``` -->
+# 
+# ## Clean pitcher data
+# 
+# ```{r}
+# pitcher_df <- readRDS('~/Documents/GitHub/fantasy_baseball_draft_bot/data/pitcher_game_logs.RDS')
+# pitcher_df <- pitcher_df %>% mutate(QS = ifelse((GS == 1) & (IP >= 6) & (ER <=3), 1, 0))
+# pitcher_df <- pitcher_df %>% mutate(underdog_fpts = W * 2 + QS * 3 + SO + (floor(IP)+((IP - floor(IP))*(1/3))) - ER)
 ```
 
 ## Clean batter data
 
-```{r}
-batter_df <- readRDS('~/Documents/GitHub/fantasy_baseball_draft_bot/data/batter_game_logs.RDS')
-batter_df <- batter_df %>% mutate(underdog_fpts = 3 * `1B` + 6 * `2B` + 8 * `3B` + 10 * HR + 3 * BB + 3 * HBP + 2 * RBI + 2 * R + 4 * SB)
-```
+<!-- ```{r} -->
+<!-- batter_df <- readRDS('~/Documents/GitHub/fantasy_baseball_draft_bot/data/batter_game_logs.RDS') -->
+<!-- batter_df <- batter_df %>% mutate(underdog_fpts = 3 * `1B` + 6 * `2B` + 8 * `3B` + 10 * HR + 3 * BB + 3 * HBP + 2 * RBI + 2 * R + 4 * SB) -->
+<!-- ``` -->
 

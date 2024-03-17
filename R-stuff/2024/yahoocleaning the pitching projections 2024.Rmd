@@ -1,0 +1,178 @@
+---
+title: "cleaning the pitching projections"
+author: "William Foote"
+date: "3/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+# zips <- read.csv("pitch_zips.csv")
+# steamer <- read.csv("pitch_steamer.csv")
+# dc <- read.csv("pitch_depthcharts.csv")
+atc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/patc_2024.csv")
+# bat <- read.csv("pitch_thebat.csv")
+
+# all_dfs <- list(bat = bat, atc = atc, dc = dc, zips = zips, steamer = steamer)
+```
+
+# Just looking
+
+## Head
+
+```{r}
+# head(zips)
+# head(steamer)
+# head(dc)
+head(atc)
+# head(bat)
+```
+
+## Make SVHD category in atc and dc
+
+```{r}
+# dc$SVHD <- with(dc, SV + HLD)
+atc$SVHD <- with(atc, SV + HLD)
+```
+
+## Impute Quality Starts using cool function
+
+## Making 6 data frames for 6 pitching categories
+
+### Helpers
+
+```{r}
+cats <- c("IP", "SO", "W", "ERA", "WHIP", "SV")
+order_small_to_large <- c("bat", "atc", "dc", "zips", "steamer")
+
+me1 <- function(x, y, cat = "QS", by = "playerid") { # If i were 1
+  temp <- merge(x[, c("Name", by, cat)], y[, c(by, cat)], by = by)
+  temp
+}
+
+me2 <- function(x, y, cat = "QS", by = "playerid") { # If i were greater than 1
+  temp <- merge(x, y[, c(by, cat)], by = by)
+  temp
+}
+```
+
+
+### The Cleaning (didnt use in 2022 data)
+
+```{r}
+# temp_qs <- me1(steamer, zips)
+# tqs2 <- me2(temp_qs, dc)
+# tqs3 <- me2(tqs2, atc)
+# tqs4 <- me2(tqs3, bat)
+# tqs4
+# 
+# temp_ip <- me1(steamer, zips, cat = "IP")
+# tip2 <- me2(temp_ip, dc, cat = "IP")
+# tip3 <- me2(tip2, atc, cat = "IP")
+# tip4 <- me2(tip3, bat, cat = "IP")
+# tip4
+# 
+# temp_so <- me1(steamer, zips, cat = "SO")
+# tso2 <- me2(temp_so, dc, cat = "SO")
+# tso3 <- me2(tso2, atc, cat = "SO")
+# tso4 <- me2(tso3, bat, cat = "SO")
+# tso4
+# 
+# temp_era <- me1(steamer, zips, cat = "ERA")
+# tera2 <- me2(temp_era, dc, cat = "ERA")
+# tera3 <- me2(tera2, atc, cat = "ERA")
+# tera4 <- me2(tera3, bat, cat = "ERA")
+# tera4
+# 
+# temp_whip <- me1(steamer, zips, cat = "WHIP")
+# twhip2 <- me2(temp_whip, dc, cat = "WHIP")
+# twhip3 <- me2(twhip2, atc, cat = "WHIP")
+# twhip4 <- me2(twhip3, bat, cat = "WHIP")
+# twhip4
+# 
+# temp_svhd <- me1(atc, dc, cat = "SVHD") 
+# good_indices <- temp_svhd$playerid %in% twhip4$playerid # This is because we didn't cut down to the right dimensions
+# temp_svhd <- temp_svhd[good_indices, ]
+# temp_svhd
+# 
+# pitch <- cbind(tip4[, c(1, 2)], IP = apply(tip4[, c(-1, -2)], 1, mean))
+# pitch <- cbind(pitch, SO = cbind(tso4[, c(1, 2)], SO = apply(tso4[, c(-1, -2)], 1, mean))[, -c(1, 2)])
+# pitch <- cbind(pitch, QS = cbind(tqs4[, c(1, 2)], QS = apply(tqs4[, c(-1, -2)], 1, mean))[, -c(1, 2)])
+# pitch <- cbind(pitch, ERA = cbind(tera4[, c(1, 2)], ERA = apply(tera4[, c(-1, -2)], 1, mean))[, -c(1, 2)])
+# pitch <- cbind(pitch, WHIP = cbind(twhip4[, c(1, 2)], WHIP = apply(twhip4[, c(-1, -2)], 1, mean))[, -c(1, 2)])
+# pitch <- cbind(pitch, SVHD = cbind(temp_svhd[, c(1, 2)], SVHD = apply(temp_svhd[, c(-1, -2)], 1, mean))[, -c(1, 2)])
+# pitch
+```
+
+# Cleaning 2022
+
+```{r}
+atc$wERA <- atc$ERA * atc$IP
+atc$wWHIP <- atc$WHIP * atc$IP
+
+pitch <- atc %>%
+  select(Name, Team, PlayerId, IP, SO, W, wERA, wWHIP, ERA, WHIP, SV)
+```
+
+
+# Now adding z-scores
+
+## Z score function
+
+```{r}
+z_score <- function(x) {
+  x <- as.numeric(x)
+  m <- mean(x, na.rm = TRUE)
+  s <- sd(x, na.rm = TRUE)
+  z <- (x - m) / s
+  z
+}
+
+process_pitching_data <- function(data, z_score_cols, top_n = NULL) {
+  # Apply z-score to specified columns
+  temp <- apply(data[, z_score_cols, drop = FALSE], 2, z_score)
+
+  # Combine with original data (excluding the z-scored columns)
+  data_processed <- cbind(data[, !(names(data) %in% z_score_cols)], temp)
+
+  # Modify specific columns
+  data_processed$ERA <- -1 * data_processed$ERA
+  data_processed$WHIP <- -1 * data_processed$WHIP
+
+  # Sum of all z-score normalized columns
+  data_processed$pr <- rowSums(data_processed[, z_score_cols, drop = FALSE], na.rm = TRUE)
+
+  # If top_n is specified, filter and recompute
+  if (!is.null(top_n)) {
+    data_ordered <- data_processed[order(data_processed$pr, decreasing = TRUE), ]
+    data_top_n <- head(data_ordered, top_n)
+
+    # Repeat the process for the top_n rows
+    return(process_pitching_data(data_top_n, z_score_cols))
+  }
+
+  # Add rank and position columns
+  data_processed$rank <- seq_len(nrow(data_processed))
+  data_processed$pos <- 'SP'
+
+  return(data_processed)
+}
+
+# Example usage:
+z_score_columns <- c("SO", "W", "wERA", "wWHIP", "SV")
+processed_data <- process_pitching_data(pitch, z_score_columns, top_n = 300)
+
+```
+
+
+## Check to see if we did it right
+
+```{r}
+head(pitching_3[with(pitching_3, order(pitching_3$pr, decreasing = TRUE)), ])
+```
+
+```{r}
+write.csv(pitching_ordered, "patc_pr.csv")
+```
+

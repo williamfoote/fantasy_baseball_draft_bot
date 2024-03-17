@@ -1,0 +1,215 @@
+---
+title: "Cleaning Batting Projections 2024"
+output: html_document
+date: "2023-02-06"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+# bzip <- read.csv("bat_zips.csv")
+batc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/batc_2024.csv")
+```
+
+# Exploratory functions
+
+```{r}
+nrow(batc)
+```
+
+# Feature Engineering
+
+The formula for Runs Created is as follows (roughly):
+
+=((H+BB+HBP-CS)*(TB)+.26*(BB+HBP))+.52(SB))/(AB+BB+HBP))
+
+Note
+
+TB = SLG * AB
+
+# Make Runs Created
+
+## First, make TB
+
+```{r}
+batc$TB <- with(batc, SLG * AB)
+```
+
+## Next try making RC
+
+```{r}
+# bsteamer$RC <- with(bsteamer, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+# bzip$RC <- with(bzip, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+
+# If they have HBP and CS in the projections:
+batc$RC <- with(batc, ((H+BB+HBP-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+
+# batc$RC <- with(batc, ((H+BB+HBP-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+# Without HBP and CS:
+#batc$RC <- with(batc, ((H+BB)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+
+# bbat$RC <- with(bbat, ((H+BB-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+# bdc$RC <- with(bdc, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+```
+
+Note, bbat and batc don't have HBP projected
+
+# Weight the ratio stats
+
+```{r}
+batc$wAVG <- batc$AVG * batc$AB
+batc$wOPS <- batc$OPS * batc$AB
+```
+
+## 2023
+
+```{r}
+batting <- batc %>%
+  select(Name, Team, PlayerId, AB, R, HR, RBI, SB, wAVG, AVG)
+
+names(batting)
+```
+
+## Write in the z-score function
+
+```{r}
+z_score <- function(x) {
+  x <- as.numeric(x)
+  m <- mean(x, na.rm = TRUE)
+  s <- sd(x, na.rm = TRUE)
+  z <- (x - m) / s
+  z
+}
+```
+
+## Use the z-score function
+
+```{r}
+process_batting_data <- function(data, z_score_cols, top_n = NULL) {
+  non_cats_names <- c('Name', 'Team', 'PlayerId', 'AB', 'AVG', 'OPS')
+  non_cats <- which(names(data) %in% non_cats_names)
+
+  # Apply z-score to specified columns
+  temp <- apply(data[, z_score_cols, drop = FALSE], 2, z_score)
+
+  # Combine with original data (excluding the z-scored columns)
+  data_processed <- cbind(data[, non_cats], temp)
+
+  # Sum of all z-score normalized columns for 'pr'
+  data_processed$pr <- rowSums(temp, na.rm = TRUE)
+
+  # If top_n is specified, filter and recompute
+  if (!is.null(top_n)) {
+    data_ordered <- data_processed[order(data_processed$pr, decreasing = TRUE), ]
+    data_top_n <- head(data_ordered, top_n)
+
+    # Repeat the process for the top_n rows
+    return(process_batting_data(data_top_n, z_score_cols))
+  }
+
+  # Add rank column
+  data_processed$rank <- seq_len(nrow(data_processed))
+
+  # Join with raw data for context
+  batting_raw <- data[, !(names(data) %in% c(z_score_cols, "AB", "AVG", "OPS"))]
+  names(batting_raw)[-c(1:3)] <- paste(names(batting_raw)[-c(1:3)], '_raw', sep = '')
+  almost_done <- merge(data_processed, batting_raw, by = c("Name", 'Team', 'PlayerId'))
+  
+  # Adjusting column indices to include 'pr'
+  final_bat <- almost_done[, c(1:3, (ncol(data_processed) - length(z_score_cols) + 1):ncol(data_processed), 
+                               4:(ncol(data_processed) - length(z_score_cols)), 
+                               (ncol(data_processed) + 1):ncol(almost_done))]
+
+  return(final_bat)
+}
+
+# Example usage:
+z_score_columns <- c("wAVG", "R", "RBI", "HR", "SB")
+processed_batting_data <- process_batting_data(batting, z_score_columns, top_n = 300)
+
+```
+
+## See if it works
+
+```{r}
+batting_in_order <- batting_3[with(batting_3, order(batting_3$pr, decreasing = TRUE)), ]
+head(batting_in_order)
+```
+
+```{r}
+write.csv(batting_in_order, "./data/batc_pr.csv")
+```
+
+## Combining with pitching
+
+```{r}
+combined <- rbind(batting_ordered[, c(1:3, ncol(batting_ordered)-1)], pitching_ordered[, c(1:3, ncol(pitching_ordered)-2)])
+shohei_combined <- sum(combined[combined$Name == 'Shohei Ohtani', 'pr'])
+test <- combined %>% 
+  distinct(Name, .keep_all = T)
+test[test$Name == 'Shohei Ohtani', 'pr'] <- shohei_combined
+
+joined <- left_join(test, id_map, by = c('PlayerId' = 'IDFANGRAPHS'))
+final <- joined %>% 
+  select(Name, Team, PlayerId, pr, POS) %>% 
+  distinct(Name, .keep_all = T)
+final <- final %>% 
+  mutate(pos_2 = if_else(POS == '1B', '1B/3B',
+                         if_else(POS == '3B', '1B/3B',
+                                 if_else(POS == '2B', '2B/SS',
+                                         if_else(POS == 'SS', '2B/SS',
+                                                 if_else(POS == 'DH', 'UTIL',
+                                                                 if_else(POS == 'SP', 'P',
+                                                                         if_else(POS == 'RP', 'P',POS))))))))
+final <- final %>% 
+  select(Name, Team, POS, pr)
+names(final) <- c('name', 'team', 'position', 'points')
+write.csv(final, 'players.csv')
+```
+
+# Combined projections
+
+```{r}
+full_20 <- read.csv('combined_2020_projections.csv')
+full_21 <- read.csv('combined_2021_projections.csv')
+full_22 <- read.csv('combined_2022_projections.csv')
+names(full_20) <- names(full_21)
+names(full_22) <- names(full_21)
+
+combined_proj = rbind(full_20, full_21, full_22)
+combined_proj = left_join(combined_proj, id_map[, c(9, 6, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
+  distinct()
+write.csv(combined_proj, 'combined_projections.csv')
+
+full_23 <- read.csv('combined_2023_projections.csv')
+names(full_23) <- names(full_21)
+combined_proj_23 <- left_join(full_23, id_map[, c(9, 6, 19, 20)], by = c('playerid' = 'IDFANGRAPHS')) %>% 
+  distinct()
+write.csv(combined_proj_23, 'combined_projections_23.csv')
+
+```
+
+## 2023 Combined projections
+
+```{r}
+fpros_adp <- read.csv('fpros_espn_adp_2023.csv')
+joined_1 <- left_join(fpros_adp[, c('Player', 'ESPN')], id_map[, c('IDFANGRAPHS', 'FANTPROSNAME', 'ESPNID', 'ESPNNAME')], 
+                      by = c('Player' = 'FANTPROSNAME'))
+
+test <- joined_1 %>% 
+  distinct(Player, ESPN, .keep_all = T)
+
+test[1, c('IDFANGRAPHS', 'ESPNID', 'ESPNNAME')] <- c(13510, 32801, 'Jose Ramirez')
+# test[266, c('ESPNID', 'ESPNNAME')] <- c(4424286, 'Spencer Torkelson')
+# test[322, c('ESPNID', 'ESPNNAME')] <- c(41325, 'Aaron Ashby')
+# test[32, c('ESPNID', 'ESPNNAME')] <- c(41199, 'Shane McClanahan')
+# test[69, c('ESPNID', 'ESPNNAME')] <- c(36380, 'Jordan Romano')
+
+bj <- left_join(batting_ordered, test, by = c('PlayerId' = 'IDFANGRAPHS'))
+pj <- left_join(pitching_ordered, test, by = c('PlayerId' = 'IDFANGRAPHS'))
+
+write.csv(bj, 'batting_for_combined_projections_23.csv')
+write.csv(pj, 'pitching_for_combined_projections_23.csv')
+```
+
