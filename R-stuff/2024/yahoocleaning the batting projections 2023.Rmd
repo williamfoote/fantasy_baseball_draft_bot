@@ -8,8 +8,25 @@ date: "2023-02-06"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-# bzip <- read.csv("bat_zips.csv")
-batc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/batc_2024.csv")
+library(stringi)
+# zips <- read.csv("pitch_zips.csv")
+# steamer <- read.csv("pitch_steamer.csv")
+# dc <- read.csv("pitch_depthcharts.csv")
+atc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/batc_2024.csv")
+id_map <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/id_map_24.csv')
+yahoo_pos <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/yahoo_pos.csv')
+yahoo_pos$Name <- stri_trans_general(yahoo_pos$Name, "Latin-ASCII")
+atc$Name <- stri_trans_general(atc$Name, "Latin-ASCII")
+
+# bat <- read.csv("pitch_thebat.csv")
+
+# all_dfs <- list(bat = bat, atc = atc, dc = dc, zips = zips, steamer = steamer)
+
+id_map_yahoo <- id_map %>% select(IDFANGRAPHS, FANGRAPHSNAME, YAHOONAME)
+
+join_1 <- left_join(atc, id_map_yahoo, by = join_by('Name' == 'FANGRAPHSNAME'))
+
+batc <- left_join(join_1, yahoo_pos, by = join_by("YAHOONAME" == 'Name'))
 ```
 
 # Exploratory functions
@@ -65,9 +82,11 @@ batc$wOPS <- batc$OPS * batc$AB
 ## 2023
 
 ```{r}
-batting <- batc %>%
-  select(Name, Team, PlayerId, AB, R, HR, RBI, SB, wAVG, AVG)
+batc <- batc %>% filter(!Position %in% c('SP', 'RP'))
 
+batting <- batc %>%
+  select(Name, Team.x, Position, PlayerId, AB, R, HR, RBI, SB, wAVG, AVG)
+names(batting)[2] <- "Team"
 names(batting)
 ```
 
@@ -87,7 +106,7 @@ z_score <- function(x) {
 
 ```{r}
 process_batting_data <- function(data, z_score_cols, top_n = NULL) {
-  non_cats_names <- c('Name', 'Team', 'PlayerId', 'AB', 'AVG', 'OPS')
+  non_cats_names <- c('Name', 'Team', 'Position', 'PlayerId', 'AB', 'AVG')
   non_cats <- which(names(data) %in% non_cats_names)
 
   # Apply z-score to specified columns

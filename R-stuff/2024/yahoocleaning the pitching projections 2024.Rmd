@@ -8,13 +8,24 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(stringi)
 # zips <- read.csv("pitch_zips.csv")
 # steamer <- read.csv("pitch_steamer.csv")
 # dc <- read.csv("pitch_depthcharts.csv")
 atc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/patc_2024.csv")
+id_map <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/id_map_24.csv')
+yahoo_pos <- read.csv('~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/yahoo_pos.csv')
+yahoo_pos$Name <- stri_trans_general(yahoo_pos$Name, "Latin-ASCII")
+
 # bat <- read.csv("pitch_thebat.csv")
 
 # all_dfs <- list(bat = bat, atc = atc, dc = dc, zips = zips, steamer = steamer)
+
+id_map_yahoo <- id_map %>% select(IDFANGRAPHS, FANGRAPHSNAME, YAHOONAME)
+
+join_1 <- left_join(atc, id_map_yahoo, by = join_by('Name' == 'FANGRAPHSNAME'))
+
+atc <- left_join(join_1, yahoo_pos, by = join_by("YAHOONAME" == 'Name'))
 ```
 
 # Just looking
@@ -108,11 +119,12 @@ me2 <- function(x, y, cat = "QS", by = "playerid") { # If i were greater than 1
 # Cleaning 2022
 
 ```{r}
+atc <- atc %>% filter(Position %in% c('SP', 'RP'))
 atc$wERA <- atc$ERA * atc$IP
 atc$wWHIP <- atc$WHIP * atc$IP
 
 pitch <- atc %>%
-  select(Name, Team, PlayerId, IP, SO, W, wERA, wWHIP, ERA, WHIP, SV)
+  select(Name, Team.x, PlayerId, Position, IP, SO, W, wERA, wWHIP, ERA, WHIP, SV)
 ```
 
 
@@ -154,7 +166,6 @@ process_pitching_data <- function(data, z_score_cols, top_n = NULL) {
 
   # Add rank and position columns
   data_processed$rank <- seq_len(nrow(data_processed))
-  data_processed$pos <- 'SP'
 
   return(data_processed)
 }
@@ -162,15 +173,48 @@ process_pitching_data <- function(data, z_score_cols, top_n = NULL) {
 # Example usage:
 z_score_columns <- c("SO", "W", "wERA", "wWHIP", "SV")
 processed_data <- process_pitching_data(pitch, z_score_columns, top_n = 300)
-
+processed_data <- separate_rows(processed_data, Position, sep = ",\\s*")
 ```
-
-
-## Check to see if we did it right
 
 ```{r}
-head(pitching_3[with(pitching_3, order(pitching_3$pr, decreasing = TRUE)), ])
+
+# Define the function
+get_nth_pr <- function(data, nth_values) {
+  # Ensure nth_values is a named vector
+  if (is.null(names(nth_values))) {
+    stop("nth_values must be a named vector.")
+  }
+  
+  # Initialize an empty data frame
+  results_df <- data.frame(Position = character(0), pr = numeric(0), stringsAsFactors = FALSE)
+  
+  # Iterate through the positions and nth values
+  for (pos in names(nth_values)) {
+    nth_value <- nth_values[pos]
+    nth_pr <- data %>%
+      filter(Position == pos) %>%
+      arrange(desc(pr)) %>%
+      slice(nth_value) %>%
+      pull(pr)
+    
+    # If the position does not have enough data, return NA
+    if (length(nth_pr) < 1) {
+      nth_pr <- NA
+    }
+    
+    # Fill the results data frame
+    results_df <- rbind(results_df, data.frame(Position = pos, replacement_pr = nth_pr))
+  }
+  
+  return(results_df)
+}
+nth_values <- c("SP" = 50, "RP" = 30)
+result_matrix <- get_nth_pr(processed_data, nth_values)
+
+join_3 <- left_join(processed_data, result_matrix[, c("Position", 'replacement_pr')], by = "Position")
+join_3$pr <- join_3$pr - join_3$replacement_pr
 ```
+
 
 ```{r}
 write.csv(pitching_ordered, "patc_pr.csv")
