@@ -1,0 +1,296 @@
+---
+title: "Cleaning Batting Projections 2025"
+output: html_document
+date: "2023-02-06"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+# bzip <- read.csv("bat_zips.csv")
+bsteamer <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2025/data/batc_2025.csv")
+# bdc <- read.csv("bat_dc.csv")
+# bbat <- read.csv("bat_bat.csv")
+# batc <- read.csv("bat_atc_23.csv")
+```
+
+# Exploratory functions
+
+```{r}
+# nrow(bzip)
+nrow(bsteamer)
+# nrow(bdc)
+# nrow(bbat)
+# nrow(batc)
+```
+
+# Reorder largest to smallest
+
+```{r}
+# ordered <- c("bsteamer", "bzip", "batc", "bbat", "bdc")
+```
+
+The formula for Runs Created is as follows (roughly):
+
+=((H+BB+HBP-CS)*(TB)+.26*(BB+HBP))+.52(SB))/(AB+BB+HBP))
+
+Note
+
+TB = SLG * AB
+
+# Make Runs Created
+
+## First, make TB
+
+```{r}
+bsteamer$TB <- with(bsteamer, SLG * AB)
+# bzip$TB <- with(bzip, SLG * AB)
+# batc$TB <- with(batc, SLG * AB)
+# bbat$TB <- with(bbat, SLG * AB)
+# bdc$TB <- with(bdc, SLG * AB)
+```
+
+## Next try making RC
+
+```{r}
+# bsteamer$RC <- with(bsteamer, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+# bzip$RC <- with(bzip, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+
+# If they have HBP and CS in the projections:
+bsteamer$RC <- with(bsteamer, ((H+BB+HBP-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+
+# batc$RC <- with(batc, ((H+BB+HBP-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+# Without HBP and CS:
+#batc$RC <- with(batc, ((H+BB)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+
+# bbat$RC <- with(bbat, ((H+BB-CS)*(TB+.26*(BB))+.52*(SB))/(AB+BB))
+# bdc$RC <- with(bdc, ((H+BB+HBP-CS)*(TB+.26*(BB+HBP))+.52*(SB))/(AB+BB+HBP))
+```
+
+Note, bbat and batc don't have HBP projected
+
+# Weight the ratio stats
+
+```{r}
+bsteamer$wAVG <- bsteamer$AVG * bsteamer$AB
+bsteamer$wOPS <- bsteamer$OPS * bsteamer$AB
+```
+
+## 2023
+
+```{r}
+batting <- bsteamer %>%
+  select(Name, Team, PlayerId, AB, R, HR, RBI, RC, wAVG, wOPS, AVG, OPS)
+
+names(batting)
+```
+
+## Write in the z-score function
+
+```{r}
+z_score <- function(x) {
+  x <- as.numeric(x)
+  m <- mean(x, na.rm = TRUE)
+  s <- sd(x, na.rm = TRUE)
+  z <- (x - m) / s
+  z
+}
+```
+
+## Use the z-score function
+
+```{r}
+batting_2 <- batting
+non_cats_names <- c('Name', 'Team', 'PlayerId', 'AB', 'AVG', 'OPS')
+non_cats <- which(names(batting_2) == non_cats_names)
+temp <- apply(batting_2[, -non_cats], 2, z_score)
+batting_2 <- cbind(batting_2[, non_cats], temp)
+sums <- apply(batting_2[, c(7:12)], 1, sum)
+batting_3 <- batting_2
+batting_3$pr <- sums
+batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
+batting_ordered$rank <- 1:nrow(batting_ordered)
+
+# Repeat the calculations on only the top 300
+# Normalize to this number to compare against batters better
+temp <- left_join(batting_ordered[1:300, 1:3], batting, by = c("Name", 'Team', 'PlayerId'))
+batting_2 <- temp
+non_cats_names <- c('Name', 'Team', 'PlayerId', 'AB', 'AVG', 'OPS')
+non_cats <- which(names(batting_2) == non_cats_names)
+temp <- apply(batting_2[, -non_cats], 2, z_score)
+batting_2 <- cbind(batting_2[, non_cats], temp)
+sums <- apply(batting_2[, c(7:12)], 1, sum)
+batting_3 <- batting_2
+batting_3$pr <- sums
+batting_ordered <- batting_3[order(batting_3$pr, decreasing = TRUE), ]
+batting_ordered$rank <- 1:nrow(batting_ordered)
+
+# add the raw data for context
+batting_raw = batting[, -c(4, 9, 10)]
+names(batting_raw)[-c(1:3)] <- paste(names(batting_raw)[-c(1:3)], '_raw', sep = '')
+almost_done = left_join(batting_ordered, batting_raw, by = c("Name", 'Team', 'PlayerId'))
+final_bat <- almost_done[, c(1:4, 15:20, 5:14)]
+```
+
+## See if it works
+
+```{r}
+batting_in_order <- batting_3[with(batting_3, order(batting_3$pr, decreasing = TRUE)), ]
+head(batting_in_order)
+```
+
+```{r}
+write.csv(batting_in_order, "~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/patc_pr.csv")
+```
+
+## Combining with pitching
+
+```{r}
+combined <- rbind(batting_ordered[, c(1:3, ncol(batting_ordered)-1)], pitching_ordered[, c(1:3, ncol(pitching_ordered)-2)])
+shohei_combined <- sum(combined[combined$Name == 'Shohei Ohtani', 'pr'])
+test <- combined %>% 
+  distinct(Name, .keep_all = T)
+test[test$Name == 'Shohei Ohtani', 'pr'] <- shohei_combined
+
+joined <- left_join(test, id_map, by = c('PlayerId' = 'IDFANGRAPHS'))
+final <- joined %>% 
+  select(Name, Team, PlayerId, pr, POS) %>% 
+  distinct(Name, .keep_all = T)
+final <- final %>% 
+  mutate(pos_2 = if_else(POS == '1B', '1B/3B',
+                         if_else(POS == '3B', '1B/3B',
+                                 if_else(POS == '2B', '2B/SS',
+                                         if_else(POS == 'SS', '2B/SS',
+                                                 if_else(POS == 'DH', 'UTIL',
+                                                                 if_else(POS == 'SP', 'P',
+                                                                         if_else(POS == 'RP', 'P',POS))))))))
+final <- final %>% 
+  select(Name, Team, pr, PlayerId)
+names(final) <- c('name', 'team', 'points', 'IDFANGRAPHS')
+# write.csv(final, 'players.csv')
+```
+
+# Join to ESPN
+
+```{r}
+espn <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/espn_positions.csv")
+
+adp_combined <- left_join(final, id_map[, c('IDFANGRAPHS', 'ESPNID')], by = 'IDFANGRAPHS')
+
+pos <- left_join(adp_combined, espn[,c('PlayerId', 'position')], by = join_by('ESPNID' == 'PlayerId'))
+
+pos[pos$name == 'Yoshinobu Yamamoto', 'position'] <- 'SP'
+pos[pos$name == 'Jung Hoo Lee', 'position'] <- 'CF'
+pos[pos$name == 'Evan Carter', 'position'] <- 'LF'
+pos[pos$name == 'Colt Keith', 'position'] <- '3B-2B'
+pos[pos$name == 'Wyatt Langford', 'position'] <- 'LF'
+pos[pos$name == 'Jackson Holliday', 'position'] <- 'SS-2B'
+pos[pos$name == 'Shota Imanaga', 'position'] <- 'SP'
+pos[pos$name == 'Cristopher Sánchez', 'position'] <- 'SP'
+pos[pos$name == 'Keaton Winn', 'position'] <- 'SP'
+```
+
+# Adjust PR by position, split position up if multi-eligible
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+pos <- distinct(pos)
+# Assuming 'df' is your initial data frame
+df <- pos %>%
+  separate_rows(position, sep = "-")
+
+# Define n values for positions
+n_values <- list(`RF` = 20, `DH` = 12, `1B` = 15, `LF` = 20, `3B` = 15,
+                 `2B` = 15, `SS` = 15, `C` = 10, `SP` = 55, `RP` = 30)
+
+# Define the function
+get_nth_pr <- function(data, nth_values) {
+  # Ensure nth_values is a named vector
+  if (is.null(names(nth_values))) {
+    stop("nth_values must be a named vector.")
+  }
+  
+  # Initialize an empty data frame
+  results_df <- data.frame(position = character(0), points = numeric(0), stringsAsFactors = FALSE)
+  
+  # Iterate through the positions and nth values
+  for (pos in names(nth_values)) {
+    nth_value <- nth_values[pos]
+    nth_pr <- data %>%
+      filter(position == pos) %>%
+      arrange(desc(points)) %>%
+      slice(nth_value) %>%
+      pull(points)
+    
+    # If the position does not have enough data, return NA
+    if (length(nth_pr) < 1) {
+      nth_pr <- NA
+    }
+    
+    # Fill the results data frame
+    results_df <- rbind(results_df, data.frame(position = pos, replacement_pr = nth_pr))
+  }
+  
+  return(results_df)
+}
+nth_values <- c("RF" = 20, "DH" = 12, "1B" = 15, "LF" = 20, "CF" = 20,
+                "3B" = 15, "2B" = 15, "SS" = 15, "C" = 10, "SP" = 60,
+                'RP' = 30)
+result_matrix <- get_nth_pr(df, nth_values)
+
+join_3 <- left_join(df, result_matrix[, c("position", 'replacement_pr')], by = "position")
+join_3$adj_points <- join_3$points - join_3$replacement_pr
+
+# join_3$name <- stri_trans_general(join_3$name, "Latin-ASCII")
+
+# Get ready to join to adp data
+join_4 <- left_join(join_3, id_map[, c('FANTPROSNAME', 'IDFANGRAPHS')], 
+                    by = 'IDFANGRAPHS')
+
+adp <- read.csv('/Users/williamfoote/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/fantpros_adp_2024.csv')
+
+join_5 <- left_join(join_4, adp[, c('Player', 'ESPN')], join_by('FANTPROSNAME' == 'Player'))
+```
+
+# Unique players df
+```{r}
+library(dplyr)
+
+# Assuming df is your DataFrame and adj_points is your column of interest
+unique_df <- join_5 %>%
+  group_by(name, team, IDFANGRAPHS) %>%
+  arrange(desc(adj_points), .by_group = TRUE) %>%
+  slice(1) %>%
+  ungroup()
+
+write.csv(join_5, "~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/full_results_2024.csv")
+write.csv(unique_df, "~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/unique_results_2024.csv")
+```
+
+# Graphs
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Assuming join_3 is your data frame and it has the columns 'points' and 'position'
+# If 'pr' is the column to be used for density and not 'points', replace 'points' with 'pr' in the code below
+
+ggplot(join_3, aes(x = points, color = position, fill = position)) + 
+  geom_density(alpha = 0.5) + 
+  labs(x = "Points", y = "Density") +
+  theme_minimal() +
+  ggtitle("Density Plot of PR by Position") +
+  scale_color_brewer(palette = "Set1") +  # Set color palette
+  scale_fill_brewer(palette = "Set1")    # Ensure fill color matches line color
+```
+
+# Adp
+
+```{r}
+
+```
+

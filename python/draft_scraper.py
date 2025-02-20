@@ -4,10 +4,10 @@ year = 2022
 league_id=55646
 year=2017
 swid = '{8F5C0C75-0EC6-4CD4-9C0C-750EC64CD455}'
-espn_s2 = 'AEBvIL4Dlefi3KlVW0JH87iCDbcx0707HaHAXb8P3MgYzjwJWCk1xxdv5Jx7tR0CBOFRNPNOwgz1%2BwcsidB7tbVivNai4urRBeT%2FzXT59InIGYVeI8KHVfwy1eHZmQy%2FS5MDXM8caPu0seOzHhRF7PpYibmzCnmRCN4OBxBDrUEioqe%2BJsL93wEsl6ElDWE8Ff8laLi4MLZUbN6gQ1jFiCYdqwbmAOfCPIK%2Fe%2FnVRRdIoI5jpK82fUujjmoDqqkDj%2BTRTERwvpxvTx49B%2F3FKZCj9GzKr3N8dh46X%2FUermxajA%3D%3D'
-'https://fantasy.espn.com/apis/v3/games/flb/seasons/2022/segments/0/leagues/55646?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav'
+espn_s2 = 'AEC0rbBvMVyZwWSSQTpW%2F9hOYoXKy9Msgi20jc7S%2F0KbS9RZFLm5%2FGGrpjEppc1hsHbMR2%2BJuR6rBvxSzSSFuWEohbqer0tXAsl5qvfFXNp2JSUr8rPje5nWViz8oP23Obr5qnSn1wpdq9Pdjj8zvIotQcbF4QBlmI1X4HhvQVfrPHAMN9wWuex12DL1eTa9TXJbZi3YTC%2Fu7iNgS1hB%2FeMT4NSZJ5Jvj0OxKl%2FrLViJMA37fe5bRUfQqsjesFV6tmHzmdkI7p6sBfknJCqNMmvp8%2Bh0AnMmC2plXZd%2BJqc1%2BA%3D%3D'
+'https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/2022/segments/0/leagues/55646?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav'
 espn_cookies = {'swid': '{8F5C0C75-0EC6-4CD4-9C0C-750EC64CD455}',
- 'espn_s2': 'AEBvIL4Dlefi3KlVW0JH87iCDbcx0707HaHAXb8P3MgYzjwJWCk1xxdv5Jx7tR0CBOFRNPNOwgz1%2BwcsidB7tbVivNai4urRBeT%2FzXT59InIGYVeI8KHVfwy1eHZmQy%2FS5MDXM8caPu0seOzHhRF7PpYibmzCnmRCN4OBxBDrUEioqe%2BJsL93wEsl6ElDWE8Ff8laLi4MLZUbN6gQ1jFiCYdqwbmAOfCPIK%2Fe%2FnVRRdIoI5jpK82fUujjmoDqqkDj%2BTRTERwvpxvTx49B%2F3FKZCj9GzKr3N8dh46X%2FUermxajA%3D%3D'}
+ 'espn_s2': 'AEC0rbBvMVyZwWSSQTpW%2F9hOYoXKy9Msgi20jc7S%2F0KbS9RZFLm5%2FGGrpjEppc1hsHbMR2%2BJuR6rBvxSzSSFuWEohbqer0tXAsl5qvfFXNp2JSUr8rPje5nWViz8oP23Obr5qnSn1wpdq9Pdjj8zvIotQcbF4QBlmI1X4HhvQVfrPHAMN9wWuex12DL1eTa9TXJbZi3YTC%2Fu7iNgS1hB%2FeMT4NSZJ5Jvj0OxKl%2FrLViJMA37fe5bRUfQqsjesFV6tmHzmdkI7p6sBfknJCqNMmvp8%2Bh0AnMmC2plXZd%2BJqc1%2BA%3D%3D'}
 
 custom_headers_2 = {
  'Connection': 'keep-alive',
@@ -37,9 +37,9 @@ headers = {
 def get_draft_details(league_id, season_id):
     # newest API v3 url
     espn_cookies = {'swid': '{8F5C0C75-0EC6-4CD4-9C0C-750EC64CD455}',
-    'espn_s2': 'AEBvIL4Dlefi3KlVW0JH87iCDbcx0707HaHAXb8P3MgYzjwJWCk1xxdv5Jx7tR0CBOFRNPNOwgz1%2BwcsidB7tbVivNai4urRBeT%2FzXT59InIGYVeI8KHVfwy1eHZmQy%2FS5MDXM8caPu0seOzHhRF7PpYibmzCnmRCN4OBxBDrUEioqe%2BJsL93wEsl6ElDWE8Ff8laLi4MLZUbN6gQ1jFiCYdqwbmAOfCPIK%2Fe%2FnVRRdIoI5jpK82fUujjmoDqqkDj%2BTRTERwvpxvTx49B%2F3FKZCj9GzKr3N8dh46X%2FUermxajA%3D%3D'}
-    url = 'https://fantasy.espn.com/apis/v3/games/flb/seasons/{}/segments/0/leagues/55646?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav'.format(season_id)
-    #url = "https://fantasy.espn.com/apis/v3/games/flb/leagueHistory/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav&seasonId={}".format(league_id, season_id)
+    'espn_s2': 'AEC0rbBvMVyZwWSSQTpW%2F9hOYoXKy9Msgi20jc7S%2F0KbS9RZFLm5%2FGGrpjEppc1hsHbMR2%2BJuR6rBvxSzSSFuWEohbqer0tXAsl5qvfFXNp2JSUr8rPje5nWViz8oP23Obr5qnSn1wpdq9Pdjj8zvIotQcbF4QBlmI1X4HhvQVfrPHAMN9wWuex12DL1eTa9TXJbZi3YTC%2Fu7iNgS1hB%2FeMT4NSZJ5Jvj0OxKl%2FrLViJMA37fe5bRUfQqsjesFV6tmHzmdkI7p6sBfknJCqNMmvp8%2Bh0AnMmC2plXZd%2BJqc1%2BA%3D%3D'}
+    url = 'https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/{}/segments/0/leagues/55646?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav'.format(season_id)
+    #url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/leagueHistory/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav&seasonId={}".format(league_id, season_id)
     r = requests.get(url,
                      cookies=espn_cookies,
                      headers=headers)
@@ -52,8 +52,8 @@ def get_draft_details(league_id, season_id):
 
 def historical_get_draft_details(league_id, season_id):
     # newest API v3 url
-    #url = "https://fantasy.espn.com/apis/v3/games/flb/seasons/{}/segments/0/leagues/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav".format(season_id, league_id)
-    url = "https://fantasy.espn.com/apis/v3/games/flb/leagueHistory/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav&seasonId={}".format(league_id, season_id)
+    #url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/{}/segments/0/leagues/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav".format(season_id, league_id)
+    url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/leagueHistory/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav&seasonId={}".format(league_id, season_id)
     r = requests.get(url,
                      headers=headers,
                      cookies=espn_cookies)
@@ -68,8 +68,8 @@ def historical_get_draft_details(league_id, season_id):
 
 # get player info
 def get_player_info(season_id):
-    #url = "https://fantasy.espn.com/apis/v3/games/flb/leagueHistory/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav&seasonId={}".format(league_id, season_id)
-    url = "https://fantasy.espn.com/apis/v3/games/flb/seasons/{}/players?scoringPeriodId=0&view=players_wl".format(season_id)
+    #url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/leagueHistory/{}?view=mDraftDetail&view=mSettings&view=mTeam&view=modular&view=mNav&seasonId={}".format(league_id, season_id)
+    url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/{}/players?scoringPeriodId=0&view=players_wl".format(season_id)
     POSITION_MAP = {
         0: 'C',
         1: '1B',
@@ -108,7 +108,7 @@ def get_player_info(season_id):
 
 # get team information
 def get_team_info(season_id):
-    url = "https://fantasy.espn.com/apis/v3/games/flb/seasons/{}?view=proTeamSchedules_wl".format(season_id)
+    url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/{}?view=proTeamSchedules_wl".format(season_id)
     r = requests.get(url,
                      headers=headers,
                      cookies=espn_cookies)
@@ -124,7 +124,7 @@ def get_team_info(season_id):
 
 # get team information
 def get_draft_strategy(season_id, league_type = 'STANDARD'):
-    url = "https://fantasy.espn.com/apis/v3/games/flb/seasons/{}/segments/0/leagues/55646?view=kona_player_info_edit_draft_strategy".format(season_id)
+    url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/{}/segments/0/leagues/55646?view=kona_player_info_edit_draft_strategy".format(season_id)
     r = requests.get(url,
                      headers=custom_headers_2,
                      cookies=espn_cookies)
