@@ -13,6 +13,7 @@ bsteamer <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2025
 # bdc <- read.csv("bat_dc.csv")
 # bbat <- read.csv("bat_bat.csv")
 # batc <- read.csv("bat_atc_23.csv")
+id_map <- read.csv('id_map_2025.csv')
 ```
 
 # Exploratory functions
@@ -174,21 +175,21 @@ names(final) <- c('name', 'team', 'points', 'IDFANGRAPHS')
 # Join to ESPN
 
 ```{r}
-espn <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/espn_positions.csv")
+espn <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2025/data/espn_positions_2025.csv")
 
 adp_combined <- left_join(final, id_map[, c('IDFANGRAPHS', 'ESPNID')], by = 'IDFANGRAPHS')
 
 pos <- left_join(adp_combined, espn[,c('PlayerId', 'position')], by = join_by('ESPNID' == 'PlayerId'))
 
-pos[pos$name == 'Yoshinobu Yamamoto', 'position'] <- 'SP'
-pos[pos$name == 'Jung Hoo Lee', 'position'] <- 'CF'
+# pos[pos$name == 'Yoshinobu Yamamoto', 'position'] <- 'SP'
+# pos[pos$name == 'Jung Hoo Lee', 'position'] <- 'CF'
 pos[pos$name == 'Evan Carter', 'position'] <- 'LF'
-pos[pos$name == 'Colt Keith', 'position'] <- '3B-2B'
-pos[pos$name == 'Wyatt Langford', 'position'] <- 'LF'
-pos[pos$name == 'Jackson Holliday', 'position'] <- 'SS-2B'
-pos[pos$name == 'Shota Imanaga', 'position'] <- 'SP'
-pos[pos$name == 'Cristopher Sánchez', 'position'] <- 'SP'
-pos[pos$name == 'Keaton Winn', 'position'] <- 'SP'
+# pos[pos$name == 'Colt Keith', 'position'] <- '3B-2B'
+# pos[pos$name == 'Wyatt Langford', 'position'] <- 'LF'
+# pos[pos$name == 'Jackson Holliday', 'position'] <- 'SS-2B'
+# pos[pos$name == 'Shota Imanaga', 'position'] <- 'SP'
+# pos[pos$name == 'Cristopher Sánchez', 'position'] <- 'SP'
+# pos[pos$name == 'Keaton Winn', 'position'] <- 'SP'
 ```
 
 # Adjust PR by position, split position up if multi-eligible
@@ -288,9 +289,20 @@ ggplot(join_3, aes(x = points, color = position, fill = position)) +
   scale_fill_brewer(palette = "Set1")    # Ensure fill color matches line color
 ```
 
-# Adp
+# PR 2
 
 ```{r}
+library(ggplot2)
+library(dplyr)
+
+ggplot(join_3, aes(x = points, color = position, fill = position)) + 
+  geom_density(alpha = 0.5) + 
+  labs(x = "Points", y = "Density") +
+  theme_minimal() +
+  ggtitle("Density Plot of PR by Position") +
+  scale_color_brewer(palette = "Set1") +  # Set color palette
+  scale_fill_brewer(palette = "Set1") +   # Ensure fill color matches line color
+  facet_wrap(~position, scales = "fixed")  # Facet by position with fixed scales
 
 ```
 

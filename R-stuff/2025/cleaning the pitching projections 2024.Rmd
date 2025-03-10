@@ -1,5 +1,5 @@
 ---
-title: "cleaning the pitching projections"
+title: "cleaning the pitching projections 2025"
 author: "William Foote"
 date: "3/12/2021"
 output: html_document
@@ -11,7 +11,7 @@ library(tidyverse)
 # zips <- read.csv("pitch_zips.csv")
 # steamer <- read.csv("pitch_steamer.csv")
 # dc <- read.csv("pitch_depthcharts.csv")
-atc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2024/data/patc_2024.csv")
+atc <- read.csv("~/Documents/GitHub/fantasy_baseball_draft_bot/R-stuff/2025/data/patc_2025.csv")
 # bat <- read.csv("pitch_thebat.csv")
 
 # all_dfs <- list(bat = bat, atc = atc, dc = dc, zips = zips, steamer = steamer)
